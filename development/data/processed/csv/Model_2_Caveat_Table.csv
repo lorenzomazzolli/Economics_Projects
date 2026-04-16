@@ -1,0 +1,9 @@
+﻿Country Name;Series;Issue;Year used;Source;Action taken;Note
+All countries;Total natural resource rents;Limited series;2000–2021;World Bank (WDI);Used full available period average;Indicator unavailable after 2021
+Laos;Trade;Limited series;2000–2016;UN National Accounts;Used country-specific available-period average;Latest year 2016
+Angola;Trade;Late start;2002–2023;UN National Accounts;Used country-specific available-period average;Series starts 2002
+Laos;Gross capital formation;Limited series;2000–2016;World Bank (WDI);Used country-specific available-period average;Latest year 2016
+Zambia;Gross capital formation;Late start;2010–2023;UN National Accounts;Used country-specific available-period average;Series starts 2010
+Angola;Gross capital formation;Late start;2002–2023;UN National Accounts;Used country-specific available-period average;Series starts 2002
+Multiple countries;HCI+;Uneven time coverage;2010–2025;World Bank (WDI);Used country-specific available-period average;Availability differs across countries (2010, 2015, 2020, 2025 observations)
+Suriname;HCI+;Reconstructured;Country-specific;World Bank (WDI);Index rescaled using available pillars;"Education pillar missing; index reconstructed using health and on-the-job learning pillars"

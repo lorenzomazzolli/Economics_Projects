@@ -1,0 +1,23 @@
+﻿Country Name;Country Code;Region;Core Growth Model;Structural Qualifier;Institution Stability
+South Africa;ZAF;Southern Africa;Diversified;Resource-based and services-supported;Stable
+Botswana;BWA;Southern Africa;Mining-led;Diamond-intensive extractive model;Stable
+Zambia;ZMB;Southern Africa;Mining-led;Copper-dependent extractive model;Intermediate
+Angola;AGO;Southern Africa;Oil-led;Hydrocarbon-dominated economy;Fragile
+Nigeria;NGA;Central Africa;Oil-led;Hydrocarbon-dominated economy;Fragile
+Mozambique;MOZ;Southern Africa;Mining-led;Extractive-led with gas/mineral orientation;Intermediate
+Namibia;NAM;Southern Africa;Mining-led;Mineral-based resource economy;Stable
+Zimbabwe;ZWE;Southern Africa;Mining-led;Mineral-based resource economy;Fragile
+Guyana;GUY;Guianas;Oil-led;Emerging offshore oil economy;Intermediate
+Suriname;SUR;Guianas;Mining-led;Gold/bauxite-oriented extractive economy;Intermediate
+Philippines;PHL;South-East Asia;Services-led;Remittance- and services-supported;Intermediate
+Thailand;THA;South-East Asia;Manufacturing-led;Export-oriented industrial economy;Stable
+Viet Nam;VNM;South-East Asia;Manufacturing-led;Export-oriented industrial economy;Stable
+Malaysia;MYS;South-East Asia;Manufacturing-led;Diversified export manufacturing base;Stable
+Lao PDR;LAO;South-East Asia;Agrarian-led;Frontier transition economy;Fragile
+Costa Rica;CRI;Central America;Services-led;High-value-added manufacturing and business services;Stable
+Guatemala;GTM;Central America;Services-led;Low-diversification services structure;Fragile
+Nicaragua;NIC;Central America;Agrarian-led;Agrarian economy with low-diversification services;Fragile
+Honduras;HND;Central America;Services-led;Low-diversification services structure;Fragile
+Panama;PAN;Central America;Services-led;Logistics, finance, and trade hub;Stable
+El Salvador;SLV;Central America;Services-led;Low-diversification services structure;Fragile
+Cambodia;KHM;South-East Asia;Agrarian-led;Frontier transition economy;Fragile

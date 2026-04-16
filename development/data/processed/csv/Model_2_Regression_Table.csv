@@ -1,0 +1,23 @@
+﻿Region;Core Growth Model;Structural Qualifier;Institution Stability;Country Name;Country Code;GDP pc (% avg annual change, 2000-2023);Log initial GDP pc (Constant 2021 international $, 2000);Governance score (-2,5 to 2,5, avg 2000-2023);Human capital index plus  (HCI+): overall score (0-325, avg 2010-2025);Gross capital formation (% of GDP, avg 2000-2023);Trade (% of GDP, avg 2000-2023);Total natural resources rents (% of GDP, avg 2000-2021);Foreign direct investment, net inflows (% of GDP, avg 2000-2023)
+Central Africa;Oil-led;Hydrocarbon-dominated economy;Fragile;Nigeria;NGA;2,083649891;3,689220323;-1,120440926;119,9761265;20,55890689;93,61049746;12,94659789;1,334096504
+Central America;Agrarian-led;Agrarian economy with low-diversification services;Fragile;Nicaragua;NIC;1,918571641;3,688263855;-0,66292081;167,9175623;26,38119825;90,8032896;2,40435271;6,119599711
+Central America;Services-led;Low-diversification services structure;Fragile;El Salvador;SLV;1,769957548;3,877685028;-0,248890899;156,2982828;18,30889399;74,54862493;0,765894104;2,2630137
+Central America;Services-led;Low-diversification services structure;Fragile;Guatemala;GTM;1,497749532;3,943019603;-0,64107669;140,6650113;16,76287607;57,55280258;1,839944982;1,080679449
+Central America;Services-led;Low-diversification services structure;Fragile;Honduras;HND;1,721609821;3,660836044;-0,640072618;148,641084;25,47681968;114,4285586;1,511030208;5,061543384
+Central America;Services-led;Logistics, finance, and trade hub;Stable;Panama;PAN;3,918157961;4,163548227;0,094143754;172,4932132;34,32655322;118,3735792;0,341330914;6,910778758
+Central America;Services-led;High-value-added manufacturing and business services;Stable;Costa Rica;CRI;2,683198858;4,146709059;0,597375915;191,3870905;19,2280788;74,03411709;1,17153328;5,559732384
+Guianas;Mining-led;Gold/bauxite-oriented extractive economy;Intermediate;Suriname;SUR;0,666564362;4,210055644;-0,107733204;179,4466703;40,23471503;123,6053466;13,8462554;-1,44897341
+Guianas;Oil-led;Emerging offshore oil economy;Intermediate;Guyana;GUY;7,79465015;3,904460912;-0,308091051;145,8947774;22,07002665;75,46011748;14,19196507;8,401187753
+South-East Asia;Agrarian-led;Frontier transition economy;Fragile;Cambodia;KHM;5,686519207;3,283760567;-0,801797162;149,0861423;26,91303113;123,6053466;2,160021848;7,55508778
+South-East Asia;Agrarian-led;Frontier transition economy;Fragile;Lao PDR;LAO;4,690505078;3,462251154;-0,896898618;138,0150056;28,62548855;79,59549443;7,987409395;4,836524352
+South-East Asia;Manufacturing-led;Diversified export manufacturing base;Stable;Malaysia;MYS;2,677172251;4,267943609;0,342031331;201,8536116;23,45759003;161,7615316;9,504286346;3,179476322
+South-East Asia;Manufacturing-led;Export-oriented industrial economy;Stable;Thailand;THA;2,672285232;4,06530049;-0,213510783;201,3220038;24,96511335;125,1543199;2,296490211;2,561861267
+South-East Asia;Manufacturing-led;Export-oriented industrial economy;Stable;Viet Nam;VNM;5,08534319;3,638411725;-0,468369031;217,0964389;33,16239411;142,3898591;7,124477473;4,835377608
+South-East Asia;Services-led;Remittance- and services-supported;Intermediate;Philippines;PHL;3,197368689;3,675818555;-0,383005378;167,9650716;20,68763243;70,21406293;1,230126845;1,723753356
+Southern Africa;Diversified;Resource-based and services-supported;Stable;South Africa;ZAF;0,98223;4,048590382;0,184956009;119,9486568;16,88001083;54,38192391;5,257035;1,765640328
+Southern Africa;Mining-led;Mineral-based resource economy;Fragile;Zimbabwe;ZWE;-0,862414379;3,790308667;-1,362839113;123,4948661;10,07151321;65,54112237;7,056891053;1,115222585
+Southern Africa;Mining-led;Extractive-led with gas/mineral orientation;Intermediate;Mozambique;MOZ;3,126732845;2,852465594;-0,550212613;118,6763902;35,80892394;89,1903651;11,06026144;15,21008133
+Southern Africa;Mining-led;Copper-dependent extractive model;Intermediate;Zambia;ZMB;2,162664997;3,346463563;-0,389916504;123,4948661;34,57531454;69,84892691;14,48726463;4,68304122
+Southern Africa;Mining-led;Diamond-intensive extractive model;Stable;Botswana;BWA;1,51172146;4,120107049;0,663845383;150,6903724;29,11410203;93,61049746;2,105180914;2,569522233
+Southern Africa;Mining-led;Mineral-based resource economy;Stable;Namibia;NAM;1,112311004;3,895333462;0,324472816;130,1004508;22,19249033;95,02792046;1,951461988;5,657344356
+Southern Africa;Oil-led;Hydrocarbon-dominated economy;Fragile;Angola;AGO;1,063907115;3,832279336;-1,046631003;111,404001;26,58368686;75,46011748;33,88317401;1,37307375

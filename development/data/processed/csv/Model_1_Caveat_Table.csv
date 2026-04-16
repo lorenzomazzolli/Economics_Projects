@@ -1,0 +1,14 @@
+﻿Country Name;Series;Issue;Year used;Source;Action taken;Note
+All countries;Total natural resource rents;Different year;2021;World Bank (WDI);Used latest available year;Indicator unavailable for 2023
+Venezuela;Multiple variables;Missing data;—;World Bank (WDI);Country excluded from sample;Too many missing observations
+Mozambique;HCI+;Outdated latest observation;2015;World Bank (WDI);Used latest available year;No recent update
+Angola;HCI+;Outdated latest observation;2020;World Bank (WDI);Used latest available year;Data gap
+Suriname;HCI+;Reconstructed;2023;World Bank (WDI);Rescaled index from available pillars;Education pillar missing
+Nigeria;Gross capital formation;Computed;2023;UN National Accounts;Calculated as GCF/GDP (LCU);WDI data missing
+Suriname;Gross capital formation;Computed;2023;UN National Accounts;Calculated as GCF/GDP (LCU);WDI data missing
+Guyana;Gross capital formation;Computed;2023;UN National Accounts;Calculated as GCF/GDP (LCU);WDI data missing
+Laos;Gross capital formation;Outdated latest observation;2016;World Bank (WDI);Used latest available year;No recent observations
+Nigeria;Trade;Computed;2023;World Bank (WDI);Trade calculated as (exports + imports)/GDP;Export/import series used
+Guyana;Trade;Computed;2023;World Bank (WDI);Trade calculated as (exports + imports)/GDP;Export/import series used
+Suriname;Trade;Computed;2023;World Bank (WDI);Trade calculated as (exports + imports)/GDP;Export/import series used
+Laos;Trade;Outdated latest observation;2016;World Bank (WDI);Used latest available year;No recent observations
