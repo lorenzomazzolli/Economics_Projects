@@ -1,4 +1,19 @@
-.DS_Store
+# Python
 __pycache__/
 .ipynb_checkpoints/
+*.pyc
+
+# macOS
+.DS_Store
+
+# Excel / Word temp files
+~$*.docx
+~$*.doc
+~$*.xlsx
+
+# IDE
 .idea/
+.vscode/
+
+# Outputs (optional - se non vuoi pushare immagini)
+# outputs/*.png
