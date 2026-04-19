@@ -37,7 +37,7 @@ Empirical analysis of core macroeconomic relationships using US data.
   - Sahm Rule
 - Data source: FRED
 - Methods: time-series regression, macro modeling
-- Folder: `/us_monetarypolicy_businesscycle`
+- Folder: `/us_macro_analysis`
 
 ---
 
