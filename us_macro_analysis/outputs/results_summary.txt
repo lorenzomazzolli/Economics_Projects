@@ -1,5 +1,4 @@
 
-
 SAHM RULE PREVIEW
       Date  U_RATE  U_RATE_MA3  U_RATE_MA3_MIN_12  SAHM_RULE  RECESSION_SIGNAL
 2024-11-01     4.2    4.133333           3.733333   0.400000             False
@@ -36,8 +35,8 @@ Beveridge's Curve: U_RATE ~ JOB_OPENINGS_RATE
 Dep. Variable:                 U_RATE   R-squared:                       0.348
 Model:                            OLS   Adj. R-squared:                  0.341
 Method:                 Least Squares   F-statistic:                     52.21
-Date:                Sat, 18 Apr 2026   Prob (F-statistic):           1.09e-10
-Time:                        17:04:59   Log-Likelihood:                -186.57
+Date:                Sun, 19 Apr 2026   Prob (F-statistic):           1.09e-10
+Time:                        18:55:53   Log-Likelihood:                -186.57
 No. Observations:                 100   AIC:                             377.1
 Df Residuals:                      98   BIC:                             382.3
 Df Model:                           1                                         
@@ -57,7 +56,7 @@ Kurtosis:                       6.722   Cond. No.                         12.6
 Notes:
 [1] Standard Errors assume that the covariance matrix of the errors is correctly specified.
 
-Beveridge Curve - quadratic fit coefficients:
+Beveridge Curve – United States (2001–2025) - quadratic fit coefficients:
 a = 0.105047, b = -1.823901, c = 10.252440
 
 TIGHTNESS PREVIEW
@@ -103,8 +102,8 @@ Okun's Law (Level): U_GAP ~ Y_GAP
 Dep. Variable:                  U_GAP   R-squared:                       0.784
 Model:                            OLS   Adj. R-squared:                  0.783
 Method:                 Least Squares   F-statistic:                     1097.
-Date:                Sat, 18 Apr 2026   Prob (F-statistic):          1.55e-102
-Time:                        17:05:05   Log-Likelihood:                -346.13
+Date:                Sun, 19 Apr 2026   Prob (F-statistic):          1.55e-102
+Time:                        18:55:57   Log-Likelihood:                -346.13
 No. Observations:                 304   AIC:                             696.3
 Df Residuals:                     302   BIC:                             703.7
 Df Model:                           1                                         
@@ -124,7 +123,7 @@ Kurtosis:                       4.393   Cond. No.                         2.33
 Notes:
 [1] Standard Errors assume that the covariance matrix of the errors is correctly specified.
 
-Okun's Law (Level Specification) - linear fit coefficients:
+Okun's Law (Level Specification) – United States (1950–2025) - linear fit coefficients:
 slope = -0.619184, intercept = 0.273764
 
 OKUN DIFFERENCE CORRELATION
@@ -141,8 +140,8 @@ Okun's Law (Difference): U_DELTA ~ Y_GROWTH_GAP
 Dep. Variable:                U_DELTA   R-squared:                       0.547
 Model:                            OLS   Adj. R-squared:                  0.545
 Method:                 Least Squares   F-statistic:                     364.4
-Date:                Sat, 18 Apr 2026   Prob (F-statistic):           7.75e-54
-Time:                        17:05:07   Log-Likelihood:                -201.88
+Date:                Sun, 19 Apr 2026   Prob (F-statistic):           7.75e-54
+Time:                        18:55:58   Log-Likelihood:                -201.88
 No. Observations:                 304   AIC:                             407.8
 Df Residuals:                     302   BIC:                             415.2
 Df Model:                           1                                         
@@ -162,7 +161,7 @@ Kurtosis:                      70.068   Cond. No.                         4.37
 Notes:
 [1] Standard Errors assume that the covariance matrix of the errors is correctly specified.
 
-Okun's Law (Difference Specification) - linear fit coefficients:
+Okun's Law (Difference Specification) – United States (1950–2025) - linear fit coefficients:
 slope = -0.118248, intercept = 0.010437
 
 PHILLIPS CORRELATIONS
@@ -180,8 +179,8 @@ Phillips's Curve: PCE_HEAD ~ EXP_INF + U_GAP
 Dep. Variable:               PCE_HEAD   R-squared:                       0.198
 Model:                            OLS   Adj. R-squared:                  0.180
 Method:                 Least Squares   F-statistic:                     10.97
-Date:                Sat, 18 Apr 2026   Prob (F-statistic):           5.50e-05
-Time:                        17:05:08   Log-Likelihood:                -181.55
+Date:                Sun, 19 Apr 2026   Prob (F-statistic):           5.50e-05
+Time:                        18:56:00   Log-Likelihood:                -181.55
 No. Observations:                  92   AIC:                             369.1
 Df Residuals:                      89   BIC:                             376.7
 Df Model:                           2                                         
@@ -202,7 +201,7 @@ Kurtosis:                       6.323   Cond. No.                         23.4
 Notes:
 [1] Standard Errors assume that the covariance matrix of the errors is correctly specified.
 
-Phillips Curve (Illustrative Scatter) - quadratic fit coefficients:
+Phillips Curve (Illustrative Scatter) – United States (2003–2025) - quadratic fit coefficients:
 a = 0.004780, b = -0.301267, c = 2.540078
 
 TAYLOR Y-GAP CORE PREVIEW
@@ -276,6 +275,5 @@ TAYLOR U-GAP HEADLINE PREVIEW
 2025-04-01      4.33       2.1 -0.206906               4.253453
 2025-07-01      4.29       2.8 -0.104200               5.252100
 2025-10-01      3.90       2.9  0.098159               5.300921
-
 
 

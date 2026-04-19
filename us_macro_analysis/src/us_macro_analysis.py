@@ -31,7 +31,6 @@ def write_to_txt(text: str) -> None:
         f.write(text)
         f.write("\n\n")
 
-
 def load_csv(file_name: str) -> pd.DataFrame:
     """
     Load CSV using project-specific formatting:
@@ -53,6 +52,12 @@ def load_csv(file_name: str) -> pd.DataFrame:
     df = df.sort_values("Date").reset_index(drop=True)
     return df
 
+def build_title(base_title: str, df: pd.DataFrame, date_col: str = "Date") -> str:
+    df_valid = df.dropna(subset=[date_col])
+    start_year = df_valid[date_col].dt.year.min()
+    end_year = df_valid[date_col].dt.year.max()
+
+    return f"{base_title} – United States ({start_year}–{end_year})"
 
 def run_ols(y: pd.Series, X: pd.DataFrame, model_name: str):
     """
@@ -76,7 +81,6 @@ def run_ols(y: pd.Series, X: pd.DataFrame, model_name: str):
     write_to_txt(output)
 
     return model
-
 
 def save_line_plot(
     df: pd.DataFrame,
@@ -137,7 +141,6 @@ def save_line_plot(
     plt.tight_layout()
     plt.savefig(OUTPUTS_DIR / file_name, dpi=300, bbox_inches="tight")
     plt.close()
-
 
 def save_scatter_plot(
     df: pd.DataFrame,
@@ -228,7 +231,6 @@ def save_scatter_plot(
     plt.savefig(OUTPUTS_DIR / file_name, dpi=300, bbox_inches="tight")
     plt.close()
 
-
 # =========================================================
 # SAHM RULE
 # Indicator framework, not regression
@@ -285,7 +287,7 @@ def run_sahm_rule() -> pd.DataFrame:
         x_col="Date",
         y_cols="SAHM_RULE",
         labels="Sahm Rule",
-        title="Sahm Rule Indicator",
+        title=build_title("Sahm Rule Indicator",df),
         y_label="Unemployment Increase (pp)",
         file_name="sahm_rule.png",
         y_limits="auto",
@@ -293,7 +295,6 @@ def run_sahm_rule() -> pd.DataFrame:
     )
 
     return df
-
 
 # =========================================================
 # BEVERIDGE CURVE + TIGHTNESS
@@ -321,7 +322,7 @@ def run_beveridge_curve() -> pd.DataFrame:
         df=df,
         x_col="U_RATE",
         y_col="JOB_OPENINGS_RATE",
-        title="Beveridge Curve",
+        title=build_title("Beveridge Curve", df),
         x_label="Unemployment Rate (%)",
         y_label="Job Openings Rate (%)",
         file_name="beveridge_curve_scatter.png",
@@ -346,7 +347,7 @@ def run_beveridge_curve() -> pd.DataFrame:
         x_col="Date",
         y_cols="TIGHTNESS",
         labels="Labour Market Tightness",
-        title="Labour Market Tightness Over Time",
+        title=build_title("Labour Market Tightness Over Time",df),
         y_label="Vacancy-to-Unemployment Ratio",
         file_name="labour_market_tightness.png",
         show_legend=False,
@@ -403,7 +404,10 @@ def run_beveridge_curve() -> pd.DataFrame:
 
         plt.plot(x_line_ex, y_line_ex, linewidth=2.5, label="Quadratic fit - ex-COVID")
 
-    plt.title("Beveridge Curve: Full Sample vs Ex-COVID")
+    title_full = build_title("Beveridge Curve (Full Sample)", df)
+    title_ex = build_title("Ex-COVID", df_ex_covid)
+
+    plt.title(f"{title_full} vs {title_ex}")
     plt.xlabel("Unemployment Rate (%)")
     plt.ylabel("Job Openings Rate (%)")
     plt.legend(frameon=False)
@@ -413,7 +417,6 @@ def run_beveridge_curve() -> pd.DataFrame:
     plt.close()
 
     return df
-
 
 # =========================================================
 # OKUN'S LAW - LEVEL
@@ -440,7 +443,7 @@ def run_okun_level() -> pd.DataFrame:
         df=df,
         x_col="Y_GAP",
         y_col="U_GAP",
-        title="Okun's Law (Level Specification)",
+        title=build_title("Okun's Law (Level Specification)", df),
         x_label="Output Gap (%)",
         y_label="Unemployment Gap (pp)",
         file_name="okun_level_scatter.png",
@@ -448,7 +451,6 @@ def run_okun_level() -> pd.DataFrame:
     )
 
     return df
-
 
 # =========================================================
 # OKUN'S LAW - DIFFERENCE
@@ -475,7 +477,7 @@ def run_okun_difference() -> pd.DataFrame:
         df=df,
         x_col="Y_GROWTH_GAP",
         y_col="U_DELTA",
-        title="Okun's Law (Difference Specification)",
+        title=build_title("Okun's Law (Difference Specification)", df),
         x_label="Output Growth Gap (pp)",
         y_label="Delta Unemployment Rate (pp)",
         file_name="okun_difference_scatter.png",
@@ -485,7 +487,6 @@ def run_okun_difference() -> pd.DataFrame:
     )
 
     return df
-
 
 # =========================================================
 # PHILLIPS CURVE
@@ -512,7 +513,7 @@ def run_phillips_curve() -> pd.DataFrame:
         df=df,
         x_col="U_GAP",
         y_col="PCE_HEAD",
-        title="Phillips Curve (Illustrative Scatter)",
+        title=build_title("Phillips Curve (Illustrative Scatter)", df),
         x_label="Unemployment Gap (pp)",
         y_label="Headline PCE Inflation (%)",
         file_name="phillips_scatter_illustrative.png",
@@ -521,7 +522,6 @@ def run_phillips_curve() -> pd.DataFrame:
     )
 
     return df
-
 
 # =========================================================
 # TAYLOR RULE - Y GAP / CORE
@@ -554,14 +554,13 @@ def run_taylor_y_gap_core() -> pd.DataFrame:
         x_col="Date",
         y_cols=["FEDFUNDS", "TAYLOR_IMPLIED_Y_CORE"],
         labels=["Fed Funds Rate", "Taylor Implied Rate"],
-        title="Taylor Rule: Y-Gap + Core PCE",
+        title=build_title("Taylor Rule: Y-Gap + Core PCE",df),
         y_label="Interest Rate (%)",
         file_name="taylor_y_gap_core.png",
         y_limits="auto"
     )
 
     return df
-
 
 # =========================================================
 # TAYLOR RULE - Y GAP / HEADLINE
@@ -594,14 +593,13 @@ def run_taylor_y_gap_headline() -> pd.DataFrame:
         x_col="Date",
         y_cols=["FEDFUNDS", "TAYLOR_IMPLIED_Y_HEAD"],
         labels=["Fed Funds Rate", "Taylor Implied Rate"],
-        title="Taylor Rule: Y-Gap + Headline PCE",
+        title=build_title("Taylor Rule: Y-Gap + Headline PCE",df),
         y_label="Interest Rate (%)",
         file_name="taylor_y_gap_headline.png",
         y_limits="auto"
     )
 
     return df
-
 
 # =========================================================
 # TAYLOR RULE - U GAP / CORE
@@ -634,14 +632,13 @@ def run_taylor_u_gap_core() -> pd.DataFrame:
         x_col="Date",
         y_cols=["FEDFUNDS", "TAYLOR_IMPLIED_U_CORE"],
         labels=["Fed Funds Rate", "Taylor Implied Rate"],
-        title="Taylor Rule: U-Gap + Core PCE",
+        title=build_title("Taylor Rule: U-Gap + Core PCE",df),
         y_label="Interest Rate (%)",
         file_name="taylor_u_gap_core.png",
         y_limits="auto"
     )
 
     return df
-
 
 # =========================================================
 # TAYLOR RULE - U GAP / HEADLINE
@@ -674,14 +671,13 @@ def run_taylor_u_gap_headline() -> pd.DataFrame:
         x_col="Date",
         y_cols=["FEDFUNDS", "TAYLOR_IMPLIED_U_HEAD"],
         labels=["Fed Funds Rate", "Taylor Implied Rate"],
-        title="Taylor Rule: U-Gap + Headline PCE",
+        title=build_title("Taylor Rule: U-Gap + Headline PCE",df),
         y_label="Interest Rate (%)",
         file_name="taylor_u_gap_headline.png",
         y_limits="auto"
     )
 
     return df
-
 
 # =========================================================
 # MAIN
@@ -715,7 +711,6 @@ def main() -> None:
 
     print(final_message)
     write_to_txt(final_message)
-
 
 if __name__ == "__main__":
     main()
