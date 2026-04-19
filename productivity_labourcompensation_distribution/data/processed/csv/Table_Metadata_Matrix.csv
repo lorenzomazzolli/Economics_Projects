@@ -1,0 +1,27 @@
+﻿;;MODULE;;;;
+;;CES bridge;Firm-side and worker-side pass-through;Firm-side pass-through;Income decomposition;Worker-side pass-through
+PROJECT_ROLE;CES bridge;Capital deepening - National currency per hour - Chain linked volume (rebased) - Growth rate, over 1 year;;;;
+;CES bridge;Multifactor productivity (hour based) - National currency per unit of total inputs - Chain linked volume (rebased) - Growth rate, over 1 year;;;;
+;CES bridge;Net capital stock  - ECU/EUR - Constant prices -ECU/EUR;;;;
+;CES bridge;Net capital stock  - National currency - Constant prices;;;;
+;CES bridge;Total factor productivity  - National currency per unit of total inputs - Index;;;;
+;Cross-section;;;Compensation of employees, Total economy - US dollars, PPP  - Current prices;;
+;Cross-section;;;*Gross value added per hour worked - US dollars per hour, PPP  - Chain linked volume (rebased);;
+;Cross-section;;;Gross domestic product, at factor cost  - US dollars, PPP - Current prices;;
+;Cross-section;;;*Gross value added, at basic prices  - US dollars, PPP  - Current prices;;
+;Cross-section;;;*Gross value added per hour worked - US dollars per hour, PPP  - Current prices;;
+;Cross-section;;;Hours worked for total employment - Hours;;
+;Time-series;;;Gross value added per hour worked - National currency per hour - Chain linked volume (rebased);Compensation of employees - National currency - Current prices;
+;Time-series;;;Gross value added per hour worked - National currency per hour - Current prices;Employers' social contributions - National currency - Current prices;
+;Time-series;;;Labour compensation per hour worked - National currency per hour - Current prices;Gross domestic product - National currency - Current prices;
+;Time-series;;;Total labour compensation (hour based) - National currency - Current prices;Operating surplus and mixed income, gross - National currency - Current prices;
+;Time-series;;;Unit labour costs (hour based) - National currency - Current prices - Index;Wages and salaries - National currency - Current prices;
+;Time-series;;;Unit labour costs (hour based) - National currency - Current prices;;
+;Time-series and cross-section;;Employment - Persons;*Adjusted wage share - Percentage of GDP at factor cost - Current prices;;
+;Time-series and cross-section;;Number of employees - Persons;*Gross value added, at basic prices  - National currency - Current prices;;Wage per employee (FTE) - US dollars, PPP - Constant prices
+;Time-series and cross-section;;;*Gross domestic product, at factor cost  - National currency - Current prices;;Gross value added - US dollars, PPP - Chain linked volume (rebased)
+;Time-series and cross-section;;;Gross value added - National currency - Current prices;;
+;;;;;;
+;;;;;;
+Note;;;;;;
+*;Alternative measures to calculate labour share or labour productivity (hour based);;;;;
