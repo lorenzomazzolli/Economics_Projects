@@ -10,10 +10,16 @@ from pathlib import Path
 
 PROJECT_DIR = Path(__file__).resolve().parents[1]
 DATA_DIR = PROJECT_DIR / "data" / "processed" / "csv"
-OUTPUTS_DIR = PROJECT_DIR / "outputs"
-OUTPUTS_DIR.mkdir(parents=True, exist_ok=True)
 
-TXT_FILE = OUTPUTS_DIR / "results_summary.txt"
+OUTPUTS_DIR = PROJECT_DIR / "outputs"
+CHARTS_DIR = OUTPUTS_DIR / "charts"
+RESULTS_DIR = OUTPUTS_DIR / "results_summary"
+
+OUTPUTS_DIR.mkdir(parents=True, exist_ok=True)
+CHARTS_DIR.mkdir(parents=True, exist_ok=True)
+RESULTS_DIR.mkdir(parents=True, exist_ok=True)
+
+TXT_FILE = RESULTS_DIR / "results_summary.txt"
 
 # Taylor (1993) benchmark calibration
 R_STAR = 2.0
@@ -139,7 +145,7 @@ def save_line_plot(
 
     plt.grid(True, alpha=0.3)
     plt.tight_layout()
-    plt.savefig(OUTPUTS_DIR / file_name, dpi=300, bbox_inches="tight")
+    plt.savefig(CHARTS_DIR / file_name, dpi=300, bbox_inches="tight")
     plt.close()
 
 def save_scatter_plot(
@@ -228,7 +234,7 @@ def save_scatter_plot(
 
     plt.grid(True, alpha=0.3)
     plt.tight_layout()
-    plt.savefig(OUTPUTS_DIR / file_name, dpi=300, bbox_inches="tight")
+    plt.savefig(CHARTS_DIR / file_name, dpi=300, bbox_inches="tight")
     plt.close()
 
 # =========================================================
@@ -413,7 +419,7 @@ def run_beveridge_curve() -> pd.DataFrame:
     plt.legend(frameon=False)
     plt.grid(True, alpha=0.3)
     plt.tight_layout()
-    plt.savefig(OUTPUTS_DIR / "beveridge_full_vs_ex_covid.png", dpi=300, bbox_inches="tight")
+    plt.savefig(CHARTS_DIR / "beveridge_full_vs_ex_covid.png", dpi=300, bbox_inches="tight")
     plt.close()
 
     return df
@@ -689,7 +695,7 @@ def main() -> None:
     if TXT_FILE.exists():
         TXT_FILE.unlink()
 
-    for file in OUTPUTS_DIR.glob("*.png"):
+    for file in CHARTS_DIR.glob("*.png"):
         file.unlink()
 
     write_to_txt("Running US Monetary Policy and Business Cycle project...")
@@ -706,7 +712,8 @@ def main() -> None:
 
     final_message = (
         "\nAll analyses completed successfully.\n"
-        f"Outputs saved in: {OUTPUTS_DIR}"
+        f"Charts saved in: {CHARTS_DIR}\n"
+        f"Results summary saved in: {TXT_FILE}"
     )
 
     print(final_message)
