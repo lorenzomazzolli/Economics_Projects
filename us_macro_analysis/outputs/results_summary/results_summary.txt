@@ -1,4 +1,3 @@
-Running US Monetary Policy and Business Cycle project...
 
 SAHM RULE PREVIEW
       Date  U_RATE  U_RATE_MA3  U_RATE_MA3_MIN_12  SAHM_RULE  RECESSION_SIGNAL
@@ -278,7 +277,6 @@ TAYLOR U-GAP HEADLINE PREVIEW
 2025-10-01      3.90       2.9  0.098159               5.300921
 
 
-All analyses completed successfully.
 Charts saved in: /Users/lorenzomazzolli/Desktop/GITHUB/Economics_Projects/us_macro_analysis/outputs/charts
 Results summary saved in: /Users/lorenzomazzolli/Desktop/GITHUB/Economics_Projects/us_macro_analysis/outputs/results_summary/results_summary.txt
 
