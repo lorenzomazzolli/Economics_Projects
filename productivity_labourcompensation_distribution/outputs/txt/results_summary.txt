@@ -1,3 +1,4 @@
+Running Productivity - Labour Compensation - Labour Share - ULC project.
 
 Project structure:
 1. Firm-side time series
@@ -116,7 +117,7 @@ Dep. Variable:        g_w_real_output   R-squared:                       0.581
 Model:                            OLS   Adj. R-squared:                  0.453
 Method:                 Least Squares   F-statistic:                -7.989e+12
 Date:                Mon, 20 Apr 2026   Prob (F-statistic):               1.00
-Time:                        01:25:58   Log-Likelihood:                 738.85
+Time:                        17:50:29   Log-Likelihood:                 738.85
 No. Observations:                 252   AIC:                            -1358.
 Df Residuals:                     192   BIC:                            -1146.
 Df Model:                          59                                         
@@ -208,7 +209,7 @@ Dep. Variable:        g_w_real_output   R-squared:                       1.000
 Model:                            OLS   Adj. R-squared:                  1.000
 Method:                 Least Squares   F-statistic:                -6.635e+28
 Date:                Mon, 20 Apr 2026   Prob (F-statistic):               1.00
-Time:                        01:25:58   Log-Likelihood:                 5203.9
+Time:                        17:50:29   Log-Likelihood:                 5203.9
 No. Observations:                 252   AIC:                        -1.029e+04
 Df Residuals:                     191   BIC:                        -1.007e+04
 Df Model:                          60                                         
@@ -303,7 +304,7 @@ Dep. Variable:              g_ulc_nom   R-squared:                       0.453
 Model:                            OLS   Adj. R-squared:                  0.285
 Method:                 Least Squares   F-statistic:                 9.569e+10
 Date:                Mon, 20 Apr 2026   Prob (F-statistic):           1.04e-32
-Time:                        01:25:58   Log-Likelihood:                 738.85
+Time:                        17:50:29   Log-Likelihood:                 738.85
 No. Observations:                 252   AIC:                            -1358.
 Df Residuals:                     192   BIC:                            -1146.
 Df Model:                          59                                         
@@ -381,25 +382,22 @@ Kurtosis:                       3.972   Cond. No.                         128.
 Notes:
 [1] Standard Errors are robust to cluster correlation (cluster)
 
-Firm-side pass-through scatter: Canada (1970-2023) - linear fit coefficients:
+Firm-side pass-through scatter: Canada (1998-2023) - linear fit coefficients:
 slope = 1.051470, intercept = -0.003619
 
-Firm-side pass-through scatter: France (1950-2023) - linear fit coefficients:
+Firm-side pass-through scatter: France (1971-2023) - linear fit coefficients:
 slope = 0.866371, intercept = -0.000056
 
-Firm-side pass-through scatter: Germany (1970-2023) - linear fit coefficients:
-slope = 0.234450, intercept = 0.007576
-
-Firm-side pass-through scatter: Italy (1970-2023) - linear fit coefficients:
+Firm-side pass-through scatter: Italy (1981-2023) - linear fit coefficients:
 slope = 0.587574, intercept = -0.001061
 
-Firm-side pass-through scatter: Japan (1970-2023) - linear fit coefficients:
+Firm-side pass-through scatter: Japan (1981-2023) - linear fit coefficients:
 slope = 0.519035, intercept = 0.003376
 
-Firm-side pass-through scatter: United Kingdom (1970-2023) - linear fit coefficients:
+Firm-side pass-through scatter: United Kingdom (1995-2023) - linear fit coefficients:
 slope = 0.413550, intercept = 0.007647
 
-Firm-side pass-through scatter: United States (1970-2023) - linear fit coefficients:
+Firm-side pass-through scatter: United States (1998-2023) - linear fit coefficients:
 slope = 1.104565, intercept = -0.006458
 
 FIRM-SIDE CROSS-SECTION FILE - DATAFRAME INFO
@@ -465,7 +463,7 @@ Dep. Variable:     ln_coe_nom_ppp_per_hour_corrected   R-squared:               
 Model:                                           OLS   Adj. R-squared:                  0.910
 Method:                                Least Squares   F-statistic:                     195.6
 Date:                               Mon, 20 Apr 2026   Prob (F-statistic):           3.36e-05
-Time:                                       01:26:28   Log-Likelihood:                 11.223
+Time:                                       17:51:16   Log-Likelihood:                 11.223
 No. Observations:                                  7   AIC:                            -18.45
 Df Residuals:                                      5   BIC:                            -18.55
 Df Model:                                          1                                         
@@ -598,7 +596,7 @@ Dep. Variable:        g_wage_real_ppp   R-squared:                       0.466
 Model:                            OLS   Adj. R-squared:                  0.348
 Method:                 Least Squares   F-statistic:                     4.215
 Date:                Mon, 20 Apr 2026   Prob (F-statistic):             0.0518
-Time:                        01:26:30   Log-Likelihood:                 656.84
+Time:                        17:51:17   Log-Likelihood:                 656.84
 No. Observations:                 216   AIC:                            -1234.
 Df Residuals:                     176   BIC:                            -1099.
 Df Model:                          39                                         
@@ -670,7 +668,7 @@ Dep. Variable:        g_wage_real_ppp   R-squared:                       0.472
 Model:                            OLS   Adj. R-squared:                  0.355
 Method:                 Least Squares   F-statistic:                     4.650
 Date:                Mon, 20 Apr 2026   Prob (F-statistic):             0.0418
-Time:                        01:26:30   Log-Likelihood:                 657.96
+Time:                        17:51:17   Log-Likelihood:                 657.96
 No. Observations:                 216   AIC:                            -1236.
 Df Residuals:                     176   BIC:                            -1101.
 Df Model:                          39                                         
@@ -732,25 +730,13 @@ MODULE 3 - NOTE
 Both labour-input definitions are retained. In practice, employee-based and employed-based
 results are treated as complementary specifications / robustness checks.
 
-Worker-side pass-through scatter: Canada (1970-2023) - linear fit coefficients:
+Worker-side pass-through scatter: Canada (1998-2023) - linear fit coefficients:
 slope = 0.516282, intercept = 0.007514
 
-Worker-side pass-through scatter: France (1970-2023) - linear fit coefficients:
+Worker-side pass-through scatter: France (1991-2023) - linear fit coefficients:
 slope = 0.583950, intercept = 0.004235
 
-Worker-side pass-through scatter: Germany (1970-2023) - linear fit coefficients:
-slope = 0.163731, intercept = 0.007070
-
-Worker-side pass-through scatter: Italy (1970-2023) - linear fit coefficients:
-slope = 0.324386, intercept = -0.001293
-
-Worker-side pass-through scatter: Japan (1970-2023) - linear fit coefficients:
-slope = 0.128689, intercept = -0.000254
-
-Worker-side pass-through scatter: United Kingdom (1970-2023) - linear fit coefficients:
-slope = 0.250940, intercept = 0.008192
-
-Worker-side pass-through scatter: United States (1970-2023) - linear fit coefficients:
+Worker-side pass-through scatter: United States (1998-2023) - linear fit coefficients:
 slope = 1.011545, intercept = -0.001723
 
 WORKER-SIDE CROSS-SECTION FILE - DATAFRAME INFO
@@ -814,7 +800,7 @@ Dep. Variable:       ln_wage_real_ppp   R-squared:                       0.331
 Model:                            OLS   Adj. R-squared:                  0.198
 Method:                 Least Squares   F-statistic:                     4.637
 Date:                Mon, 20 Apr 2026   Prob (F-statistic):             0.0839
-Time:                        01:26:47   Log-Likelihood:                 3.9809
+Time:                        17:51:50   Log-Likelihood:                 3.9809
 No. Observations:                   7   AIC:                            -3.962
 Df Residuals:                       5   BIC:                            -4.070
 Df Model:                           1                                         
@@ -848,7 +834,7 @@ Dep. Variable:       ln_wage_real_ppp   R-squared:                       0.616
 Model:                            OLS   Adj. R-squared:                  0.539
 Method:                 Least Squares   F-statistic:                     23.68
 Date:                Mon, 20 Apr 2026   Prob (F-statistic):            0.00461
-Time:                        01:26:47   Log-Likelihood:                 5.9196
+Time:                        17:51:50   Log-Likelihood:                 5.9196
 No. Observations:                   7   AIC:                            -7.839
 Df Residuals:                       5   BIC:                            -7.947
 Df Model:                           1                                         
@@ -908,4 +894,7 @@ SUMMARY - CROSS-SECTION SNAPSHOT
 United Kingdom            2023               0.047015                        0.029213                0.621345                  109.553686                   94.876877             62797.046
  United States            2023               0.058083                        0.033733                0.580769                  156.103602                  146.794268             82078.428
 
+
+All analyses completed successfully.
+Outputs saved in: /Users/lorenzomazzolli/Desktop/GITHUB/Economics_Projects/productivity_labourcompensation_distribution/outputs
 

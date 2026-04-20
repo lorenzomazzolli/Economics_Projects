@@ -226,22 +226,15 @@ def safe_file_stub(text: str) -> str:
         .replace("'", "")
     )
 
-def get_year_range(df: pd.DataFrame, year_col: str = "year") -> str:
-    valid = df[[year_col]].dropna()
-    if valid.empty:
-        return "No data"
+# =========================================================
+# HELPERS
+# =========================================================
 
-    start = int(valid[year_col].min())
-    end = int(valid[year_col].max())
-
-    if start == end:
-        return f"{start}"
-    return f"{start}-{end}"
-
-def _auto_limits(series: pd.Series, pad_ratio: float = 0.05, min_pad: float = 0.25) -> tuple[float, float]:
+def _auto_limits(series: pd.Series, pad_ratio: float = 0.04, min_pad: float = 0.01) -> tuple[float, float]:
     valid = series.dropna()
     if valid.empty:
         return (0.0, 1.0)
+
     vmin = float(valid.min())
     vmax = float(valid.max())
 
@@ -407,13 +400,17 @@ def save_line_plot(
     x_label: str = "Year",
     show_legend: bool = True,
     hlines=None,
+    start_year: int | None = None,
+    note_text: str | None = None,
 ) -> None:
     if isinstance(y_cols, str):
         y_cols = [y_cols]
     if isinstance(labels, str):
         labels = [labels]
 
-    valid_cols = [c for c in y_cols if c in df.columns]
+    work = _trim_from_year(df.copy(), x_col, start_year)
+
+    valid_cols = [c for c in y_cols if c in work.columns]
     if not valid_cols:
         return
 
@@ -421,9 +418,9 @@ def save_line_plot(
 
     plotted_cols = []
     for col, label in zip(y_cols, labels):
-        if col not in df.columns:
+        if col not in work.columns:
             continue
-        valid = df[[x_col, col]].dropna()
+        valid = work[[x_col, col]].dropna()
         if not valid.empty:
             plt.plot(valid[x_col], valid[col], label=label, linewidth=1.8)
             plotted_cols.append(col)
@@ -445,15 +442,21 @@ def save_line_plot(
     plt.xlabel(x_label)
     plt.ylabel(y_label)
 
-    y_values = pd.concat([df[c].dropna() for c in plotted_cols], axis=0)
+    y_values = pd.concat([work[c].dropna() for c in plotted_cols], axis=0)
     if hlines is not None:
-        y_values = pd.concat([y_values, pd.Series([h["y"] for h in hlines], dtype=float)], axis=0)
+        y_values = pd.concat(
+            [y_values, pd.Series([h["y"] for h in hlines], dtype=float)],
+            axis=0
+        )
 
-    ymin, ymax = _auto_limits(y_values)
+    ymin, ymax = _auto_limits(y_values, pad_ratio=0.04, min_pad=0.01)
     plt.ylim(ymin, ymax)
 
     if show_legend:
         plt.legend(frameon=False)
+
+    if note_text:
+        plt.figtext(0.5, -0.03, note_text, ha="center", fontsize=9)
 
     plt.grid(True, alpha=0.3)
     plt.tight_layout()
@@ -461,46 +464,16 @@ def save_line_plot(
     plt.savefig(output_dir / file_name, dpi=300, bbox_inches="tight")
     plt.close()
 
-def save_dual_axis_plot(
-    df: pd.DataFrame,
-    x_col: str,
-    y1_col: str,
-    y2_col: str,
-    title: str,
-    file_name: str,
-    output_dir: Path,
-    x_label: str = "Year",
-    y1_label: str = "Labour share",
-    y2_label: str = "Index",
-) -> None:
-    valid = df[[x_col, y1_col, y2_col]].dropna()
+def _first_valid_year(df: pd.DataFrame, year_col: str, value_col: str) -> int | None:
+    valid = df[[year_col, value_col]].dropna()
     if valid.empty:
-        return
+        return None
+    return int(valid[year_col].min())
 
-    fig, ax1 = plt.subplots(figsize=(10, 5))
-
-    ax1.plot(valid[x_col], valid[y1_col], linewidth=1.8, label=y1_label)
-    ax1.set_xlabel(x_label)
-    ax1.set_ylabel(y1_label)
-    y1min, y1max = _auto_limits(valid[y1_col], pad_ratio=0.05, min_pad=0.01)
-    ax1.set_ylim(y1min, y1max)
-    ax1.grid(True, alpha=0.3)
-
-    ax2 = ax1.twinx()
-    ax2.plot(valid[x_col], valid[y2_col], linewidth=1.8, linestyle="--", label=y2_label)
-    ax2.set_ylabel(y2_label)
-    y2min, y2max = _auto_limits(valid[y2_col], pad_ratio=0.05, min_pad=0.5)
-    ax2.set_ylim(y2min, y2max)
-
-    lines_1, labels_1 = ax1.get_legend_handles_labels()
-    lines_2, labels_2 = ax2.get_legend_handles_labels()
-    ax1.legend(lines_1 + lines_2, labels_1 + labels_2, frameon=False)
-
-    plt.title(title)
-    plt.tight_layout()
-    output_dir.mkdir(parents=True, exist_ok=True)
-    plt.savefig(output_dir / file_name, dpi=300, bbox_inches="tight")
-    plt.close()
+def _trim_from_year(df: pd.DataFrame, year_col: str, start_year: int | None) -> pd.DataFrame:
+    if start_year is None:
+        return df.copy()
+    return df[df[year_col] >= start_year].copy()
 
 def save_scatter_plot(
     df: pd.DataFrame,
@@ -514,6 +487,7 @@ def save_scatter_plot(
     fit_type: str | None = None,
     alpha: float = 0.75,
     label_col: str | None = None,
+    note_text: str | None = None,
 ) -> None:
     cols_needed = [x_col, y_col]
     if label_col is not None:
@@ -578,16 +552,46 @@ def save_scatter_plot(
     plt.xlabel(x_label)
     plt.ylabel(y_label)
 
-    xmin, xmax = _auto_limits(valid[x_col], pad_ratio=0.05, min_pad=0.25)
-    ymin, ymax = _auto_limits(valid[y_col], pad_ratio=0.05, min_pad=0.25)
+    xmin, xmax = _auto_limits(valid[x_col], pad_ratio=0.04, min_pad=0.005)
+    ymin, ymax = _auto_limits(valid[y_col], pad_ratio=0.04, min_pad=0.005)
     plt.xlim(xmin, xmax)
     plt.ylim(ymin, ymax)
+
+    if note_text:
+        plt.figtext(0.5, -0.03, note_text, ha="center", fontsize=9)
 
     plt.grid(True, alpha=0.3)
     plt.tight_layout()
     output_dir.mkdir(parents=True, exist_ok=True)
     plt.savefig(output_dir / file_name, dpi=300, bbox_inches="tight")
     plt.close()
+
+def get_plot_year_range(df: pd.DataFrame, year_col: str = "year") -> str:
+    valid = df[[year_col]].dropna()
+    if valid.empty:
+        return "No data"
+    start = int(valid[year_col].min())
+    end = int(valid[year_col].max())
+    return f"{start}" if start == end else f"{start}-{end}"
+
+
+def choose_scatter_fit(df: pd.DataFrame, x_col: str, y_col: str,
+                       min_obs: int = 6, corr_threshold: float = 0.5):
+
+    valid = df[[x_col, y_col]].dropna()
+
+    if len(valid) < min_obs:
+        return None
+
+    corr = valid[x_col].corr(valid[y_col])
+
+    if pd.isna(corr):
+        return None
+
+    if abs(corr) >= corr_threshold:
+        return "linear"
+
+    return None
 
 # =========================================================
 # METADATA
@@ -700,11 +704,9 @@ def run_firm_side_time_series() -> pd.DataFrame:
 
     # ===================== GAP =====================
 
-    df["gap_firm"] = np.where(
-        (df["prod_index"] > 0) & (df["w_real_output_index"] > 0),
-        np.log(df["prod_index"] / df["w_real_output_index"]),
-        np.nan,
-    )
+    df["gap_firm"] = np.log(df["prod_index"]) - np.log(df["w_real_output_index"])
+    df.loc[~np.isfinite(df["gap_firm"]), "gap_firm"] = np.nan
+
     df.loc[~np.isfinite(df["gap_firm"]), "gap_firm"] = np.nan
 
     # ===================== REPORT =====================
@@ -769,248 +771,261 @@ def run_firm_side_time_series() -> pd.DataFrame:
             cluster_col="country_name",
         )
 
-    # ===================== COUNTRY CHARTS =====================
+        # ===================== COUNTRY CHARTS =====================
 
-    for country in BENCHMARK_COUNTRIES:
+        for country in BENCHMARK_COUNTRIES:
 
-        tmp = df[df["country_name"] == country].copy()
-        if tmp.empty:
-            continue
+            tmp = df[df["country_name"] == country].copy()
+            if tmp.empty:
+                continue
 
-        stub = safe_file_stub(country)
-        time_range = get_year_range(tmp)
+            stub = safe_file_stub(country)
 
-        scatter_tmp = tmp[["year", "g_prod_real", "g_w_real_output"]].dropna().copy()
+            base_year_indices = pair_base_years.get(country)
+            base_year_ulc = _first_valid_year(tmp, "year", "ulc_index_rebased")
+            base_year_ls = _first_valid_year(tmp, "year", "labour_share")
 
-        if len(scatter_tmp) >= 3:
-            scatter_tmp["year_label"] = scatter_tmp["year"].astype(int).astype(str)
+            tmp_indices = _trim_from_year(tmp, "year", base_year_indices)
+            tmp_ulc = _trim_from_year(tmp, "year", base_year_ulc)
+            tmp_ls = _trim_from_year(tmp, "year", base_year_ls)
 
-        save_line_plot(
-            df=tmp,
-            x_col="year",
-            y_cols=["prod_index", "w_real_output_index"],
-            labels=["Productivity", "Wage"],
-            title=f"{country} indices ({time_range})",
-            y_label="Index",
-            file_name=f"firm_ts_indices_{stub}.png",
-            output_dir=FIRM_TS_CHARTS_DIR,
-        )
+            time_range_indices = get_plot_year_range(tmp_indices)
+            time_range_ulc = get_plot_year_range(tmp_ulc)
+            time_range_ls = get_plot_year_range(tmp_ls)
 
-        save_line_plot(
-            df=tmp,
-            x_col="year",
-            y_cols=["ulc_index_rebased"],
-            labels=["ULC"],
-            title=f"{country} ULC ({time_range})",
-            y_label="Index",
-            file_name=f"firm_ts_ulc_{stub}.png",
-            output_dir=FIRM_TS_CHARTS_DIR,
-            show_legend=False,
-        )
+            scatter_tmp = tmp[["year", "g_prod_real", "g_w_real_output"]].dropna().copy()
+            scatter_time_range = get_plot_year_range(scatter_tmp)
+            fit_type_ts = choose_scatter_fit(scatter_tmp, "g_prod_real", "g_w_real_output")
 
-        save_dual_axis_plot(
-            df=tmp,
-            x_col="year",
-            y1_col="labour_share",
-            y2_col="labour_share_index",
-            title=f"{country} labour share ({time_range})",
-            file_name=f"firm_ts_ls_{stub}.png",
-            output_dir=FIRM_TS_CHARTS_DIR,
-        )
+            if len(scatter_tmp) >= 3:
+                scatter_tmp["year_label"] = scatter_tmp["year"].astype(int).astype(str)
 
-        save_line_plot(
-            df=tmp,
-            x_col="year",
-            y_cols=["gap_firm"],
-            labels=["Gap"],
-            title=f"{country} gap ({time_range})",
-            y_label="log gap",
-            file_name=f"firm_ts_gap_{stub}.png",
-            output_dir=FIRM_TS_CHARTS_DIR,
-            show_legend=False,
-            hlines=[{"y": 0.0}],
-        )
-
-        save_scatter_plot(
-            df=scatter_tmp,
-            x_col="g_prod_real",
-            y_col="g_w_real_output",
-            title=f"Firm-side pass-through scatter: {country} ({time_range})",
-            x_label="Δln(Productivity per hour, real)",
-            y_label="Δln(Real product wage)",
-            file_name=f"firm_ts_scatter_{stub}.png",
-            output_dir=FIRM_TS_CHARTS_DIR,
-            fit_type="linear",
-            label_col="year_label",
-        )
-
-    # =========================================================
-    # G7 COMPARATIVE CHARTS - FIRM SIDE TIME SERIES
-    # =========================================================
-
-    # --- 1) PRODUCTIVITY INDEX G7
-
-    g7_prod, g7_prod_base = rebase_single_series_common_year_across_countries(
-        df,
-        "gva_ph_real_nc",
-        countries=BENCHMARK_COUNTRIES
-    )
-
-    plt.figure(figsize=(10, 6))
-    for country in BENCHMARK_COUNTRIES:
-        tmp = g7_prod[
-            g7_prod["country_name"] == country
-        ].dropna(subset=["year", "gva_ph_real_nc_common_index"])
-
-        if not tmp.empty:
-            plt.plot(
-                tmp["year"],
-                tmp["gva_ph_real_nc_common_index"],
-                linewidth=1.8,
-                label=country
+            save_line_plot(
+                df=tmp_indices,
+                x_col="year",
+                y_cols=["prod_index", "w_real_output_index"],
+                labels=[
+                    "Real labour productivity per hour index",
+                    "Real product wage per hour index",
+                ],
+                title=f"Firm-side indices: {country} ({time_range_indices})",
+                y_label="Index (common base year within country = 100)",
+                file_name=f"firm_ts_indices_{stub}.png",
+                output_dir=FIRM_TS_CHARTS_DIR,
+                start_year=base_year_indices,
+                note_text="Series: real GVA per hour (chain-linked volume) vs labour compensation per hour deflated by output prices.",
             )
 
-    plt.title(f"Firm-side productivity index: G7 comparison (common base year = {g7_prod_base})")
-    plt.xlabel("Year")
-    plt.ylabel("Index")
-    plt.legend(frameon=False)
-    plt.grid(True, alpha=0.3)
-    plt.tight_layout()
-    plt.savefig(
-        COMPARATIVE_CHARTS_DIR / "firm_ts_prod_index_g7.png",
-        dpi=300,
-        bbox_inches="tight"
-    )
-    plt.close()
-
-    # --- 2) REAL PRODUCT WAGE INDEX G7
-
-    plt.figure(figsize=(10, 6))
-    for country in BENCHMARK_COUNTRIES:
-        tmp = df[
-            df["country_name"] == country
-        ].dropna(subset=["year", "w_real_output_index"])
-
-        if not tmp.empty:
-            plt.plot(
-                tmp["year"],
-                tmp["w_real_output_index"],
-                linewidth=1.8,
-                label=country
+            save_line_plot(
+                df=tmp_ulc,
+                x_col="year",
+                y_cols=["ulc_index_rebased"],
+                labels=["Unit labour cost index"],
+                title=f"Firm-side unit labour cost index: {country} ({time_range_ulc})",
+                y_label="Index (first available year = 100)",
+                file_name=f"firm_ts_ulc_{stub}.png",
+                output_dir=FIRM_TS_CHARTS_DIR,
+                show_legend=False,
+                start_year=base_year_ulc,
+                note_text="ULC = nominal labour compensation per hour relative to real productivity per hour.",
             )
 
-    plt.title("Firm-side real product wage index: G7 comparison")
-    plt.xlabel("Year")
-    plt.ylabel("Index")
-    plt.legend(frameon=False)
-    plt.grid(True, alpha=0.3)
-    plt.tight_layout()
-    plt.savefig(
-        COMPARATIVE_CHARTS_DIR / "firm_ts_product_wage_index_g7.png",
-        dpi=300,
-        bbox_inches="tight"
-    )
-    plt.close()
-
-    # --- 3) ULC INDEX G7
-
-    g7_ulc, g7_ulc_base = rebase_single_series_common_year_across_countries(
-        df,
-        "ulc_index",
-        countries=BENCHMARK_COUNTRIES
-    )
-
-    plt.figure(figsize=(10, 6))
-    for country in BENCHMARK_COUNTRIES:
-        tmp = g7_ulc[
-            g7_ulc["country_name"] == country
-        ].dropna(subset=["year", "ulc_index_common_index"])
-
-        if not tmp.empty:
-            plt.plot(
-                tmp["year"],
-                tmp["ulc_index_common_index"],
-                linewidth=1.8,
-                label=country
+            save_line_plot(
+                df=tmp_ls,
+                x_col="year",
+                y_cols=["labour_share"],
+                labels=["Labour share (% of nominal GVA)"],
+                title=f"Firm-side labour share (% of nominal GVA): {country} ({time_range_ls})",
+                y_label="Ratio",
+                file_name=f"firm_ts_ls_{stub}.png",
+                output_dir=FIRM_TS_CHARTS_DIR,
+                show_legend=False,
+                start_year=base_year_ls,
+                note_text="Labour share = total labour compensation / nominal gross value added.",
             )
 
-    plt.title(f"Firm-side ULC index: G7 comparison (common base year = {g7_ulc_base})")
-    plt.xlabel("Year")
-    plt.ylabel("Index")
-    plt.legend(frameon=False)
-    plt.grid(True, alpha=0.3)
-    plt.tight_layout()
-    plt.savefig(
-        COMPARATIVE_CHARTS_DIR / "firm_ts_ulc_index_g7.png",
-        dpi=300,
-        bbox_inches="tight"
-    )
-    plt.close()
-
-    # --- 4) LABOUR SHARE INDEX G7
-
-    g7_ls, g7_ls_base = rebase_single_series_common_year_across_countries(
-        df,
-        "labour_share",
-        countries=BENCHMARK_COUNTRIES
-    )
-
-    plt.figure(figsize=(10, 6))
-    for country in BENCHMARK_COUNTRIES:
-        tmp = g7_ls[
-            g7_ls["country_name"] == country
-        ].dropna(subset=["year", "labour_share_common_index"])
-
-        if not tmp.empty:
-            plt.plot(
-                tmp["year"],
-                tmp["labour_share_common_index"],
-                linewidth=1.8,
-                label=country
+            save_line_plot(
+                df=tmp_indices,
+                x_col="year",
+                y_cols=["gap_firm"],
+                labels=["Firm-side productivity–real product wage gap"],
+                title=f"Firm-side productivity–real product wage gap: {country} ({time_range_indices})",
+                y_label="ln(Productivity index / Real product wage index)",
+                file_name=f"firm_ts_gap_{stub}.png",
+                output_dir=FIRM_TS_CHARTS_DIR,
+                show_legend=False,
+                start_year=base_year_indices,
+                hlines=[{"y": 0.0, "label": "Zero gap"}],
+                note_text="Gap = ln(real labour productivity per hour index / real product wage per hour index).",
             )
 
-    plt.title(f"Firm-side labour share index: G7 comparison (common base year = {g7_ls_base})")
-    plt.xlabel("Year")
-    plt.ylabel("Index")
-    plt.legend(frameon=False)
-    plt.grid(True, alpha=0.3)
-    plt.tight_layout()
-    plt.savefig(
-        COMPARATIVE_CHARTS_DIR / "firm_ts_labour_share_index_g7.png",
-        dpi=300,
-        bbox_inches="tight"
-    )
-    plt.close()
+            if len(scatter_tmp) >= 3:
+                save_scatter_plot(
+                    df=scatter_tmp,
+                    x_col="g_prod_real",
+                    y_col="g_w_real_output",
+                    title=f"Firm-side pass-through scatter: {country} ({scatter_time_range})",
+                    x_label="Δln(Real labour productivity per hour)",
+                    y_label="Δln(Real product wage per hour)",
+                    file_name=f"firm_ts_scatter_{stub}.png",
+                    output_dir=FIRM_TS_CHARTS_DIR,
+                    fit_type=fit_type_ts,
+                    label_col="year_label",
+                    note_text="Scatter of annual log changes; wage = labour compensation per hour deflated by output prices.",
+                )
 
-    # --- 5) PRODUCTIVITY-WAGE GAP G7
+                # =========================================================
+                # G7 COMPARATIVE CHARTS - FIRM SIDE TIME SERIES
+                # =========================================================
 
-    plt.figure(figsize=(10, 6))
-    for country in BENCHMARK_COUNTRIES:
-        tmp = df[
-            df["country_name"] == country
-        ].dropna(subset=["year", "gap_firm"])
+                # --- 1) PRODUCTIVITY INDEX G7
+                g7_prod, g7_prod_base = rebase_single_series_common_year_across_countries(
+                    df,
+                    "gva_ph_real_nc",
+                    countries=BENCHMARK_COUNTRIES
+                )
+                g7_prod = _trim_from_year(g7_prod, "year", g7_prod_base)
+                time_range_g7_prod = get_plot_year_range(g7_prod)
 
-        if not tmp.empty:
-            plt.plot(
-                tmp["year"],
-                tmp["gap_firm"],
-                linewidth=1.8,
-                label=country
-            )
+                plt.figure(figsize=(10, 6))
+                for country in BENCHMARK_COUNTRIES:
+                    tmp = g7_prod[g7_prod["country_name"] == country].dropna(
+                        subset=["year", "gva_ph_real_nc_common_index"]
+                    )
+                    if not tmp.empty:
+                        plt.plot(tmp["year"], tmp["gva_ph_real_nc_common_index"], linewidth=1.8, label=country)
 
-    plt.axhline(0.0, linestyle="--", linewidth=1.2)
-    plt.title("Firm-side productivity-wage gap: G7 comparison")
-    plt.xlabel("Year")
-    plt.ylabel("ln(Productivity index / Real product wage index)")
-    plt.legend(frameon=False)
-    plt.grid(True, alpha=0.3)
-    plt.tight_layout()
-    plt.savefig(
-        COMPARATIVE_CHARTS_DIR / "firm_ts_gap_g7.png",
-        dpi=300,
-        bbox_inches="tight"
-    )
-    plt.close()
+                plt.title(
+                    f"Firm-side real labour productivity index: G7 comparison "
+                    f"({time_range_g7_prod}, base = {g7_prod_base})"
+                )
+                plt.xlabel("Year")
+                plt.ylabel("Index")
+                plt.legend(frameon=False)
+                plt.grid(True, alpha=0.3)
+                plt.figtext(0.5, -0.03, "Series: real GVA per hour, chain-linked volume.", ha="center", fontsize=9)
+                plt.tight_layout()
+                plt.savefig(COMPARATIVE_CHARTS_DIR / "firm_ts_prod_index_g7.png", dpi=300, bbox_inches="tight")
+                plt.close()
+
+                # --- 2) REAL PRODUCT WAGE INDEX G7
+                g7_wage, g7_wage_base = rebase_single_series_common_year_across_countries(
+                    df,
+                    "w_real_output_index",
+                    countries=BENCHMARK_COUNTRIES
+                )
+                g7_wage = _trim_from_year(g7_wage, "year", g7_wage_base)
+                time_range_g7_wage = get_plot_year_range(g7_wage)
+
+                plt.figure(figsize=(10, 6))
+                for country in BENCHMARK_COUNTRIES:
+                    tmp = g7_wage[g7_wage["country_name"] == country].dropna(
+                        subset=["year", "w_real_output_index_common_index"]
+                    )
+                    if not tmp.empty:
+                        plt.plot(tmp["year"], tmp["w_real_output_index_common_index"], linewidth=1.8, label=country)
+
+                plt.title(
+                    f"Firm-side real product wage index: G7 comparison "
+                    f"({time_range_g7_wage}, base = {g7_wage_base})"
+                )
+                plt.xlabel("Year")
+                plt.ylabel("Index")
+                plt.legend(frameon=False)
+                plt.grid(True, alpha=0.3)
+                plt.figtext(0.5, -0.03, "Series: labour compensation per hour deflated by output prices.", ha="center",
+                            fontsize=9)
+                plt.tight_layout()
+                plt.savefig(COMPARATIVE_CHARTS_DIR / "firm_ts_product_wage_index_g7.png", dpi=300, bbox_inches="tight")
+                plt.close()
+
+                # --- 3) ULC INDEX G7
+                g7_ulc, g7_ulc_base = rebase_single_series_common_year_across_countries(
+                    df,
+                    "ulc_index",
+                    countries=BENCHMARK_COUNTRIES
+                )
+                g7_ulc = _trim_from_year(g7_ulc, "year", g7_ulc_base)
+                time_range_g7_ulc = get_plot_year_range(g7_ulc)
+
+                plt.figure(figsize=(10, 6))
+                for country in BENCHMARK_COUNTRIES:
+                    tmp = g7_ulc[g7_ulc["country_name"] == country].dropna(
+                        subset=["year", "ulc_index_common_index"]
+                    )
+                    if not tmp.empty:
+                        plt.plot(tmp["year"], tmp["ulc_index_common_index"], linewidth=1.8, label=country)
+
+                plt.title(
+                    f"Firm-side unit labour cost index: G7 comparison "
+                    f"({time_range_g7_ulc}, base = {g7_ulc_base})"
+                )
+                plt.xlabel("Year")
+                plt.ylabel("Index")
+                plt.legend(frameon=False)
+                plt.grid(True, alpha=0.3)
+                plt.figtext(0.5, -0.03, "ULC = nominal labour compensation per hour / real productivity per hour.",
+                            ha="center", fontsize=9)
+                plt.tight_layout()
+                plt.savefig(COMPARATIVE_CHARTS_DIR / "firm_ts_ulc_index_g7.png", dpi=300, bbox_inches="tight")
+                plt.close()
+
+                # --- 4) LABOUR SHARE G7
+                g7_ls = df[df["country_name"].isin(BENCHMARK_COUNTRIES)].copy()
+                g7_ls = _trim_from_year(g7_ls, "year", 1997)
+                time_range_g7_ls = get_plot_year_range(g7_ls)
+
+                plt.figure(figsize=(10, 6))
+                for country in BENCHMARK_COUNTRIES:
+                    tmp = g7_ls[g7_ls["country_name"] == country].dropna(
+                        subset=["year", "labour_share"]
+                    )
+                    if not tmp.empty:
+                        plt.plot(tmp["year"], tmp["labour_share"], linewidth=1.8, label=country)
+
+                plt.title(
+                    f"Firm-side labour share: G7 comparison ({time_range_g7_ls})"
+                )
+                plt.xlabel("Year")
+                plt.ylabel("Labour share")
+                plt.legend(frameon=False)
+                plt.grid(True, alpha=0.3)
+                plt.figtext(0.5, -0.03, "Labour share = total labour compensation / nominal gross value added.",
+                            ha="center", fontsize=9)
+                plt.tight_layout()
+                plt.savefig(COMPARATIVE_CHARTS_DIR / "firm_ts_labour_share_g7.png", dpi=300, bbox_inches="tight")
+                plt.close()
+
+                # --- 5) PRODUCTIVITY-WAGE GAP G7
+                g7_gap = _trim_from_year(
+                    df[df["country_name"].isin(BENCHMARK_COUNTRIES)].copy(),
+                    "year",
+                    g7_wage_base
+                )
+                time_range_g7_gap = get_plot_year_range(g7_gap)
+
+                plt.figure(figsize=(10, 6))
+                for country in BENCHMARK_COUNTRIES:
+                    tmp = g7_gap[g7_gap["country_name"] == country].dropna(
+                        subset=["year", "gap_firm"]
+                    )
+                    if not tmp.empty:
+                        plt.plot(tmp["year"], tmp["gap_firm"], linewidth=1.8, label=country)
+
+                plt.axhline(0.0, linestyle="--", linewidth=1.2)
+                plt.title(
+                    f"Firm-side productivity–real product wage gap: G7 comparison "
+                    f"({time_range_g7_gap})"
+                )
+                plt.xlabel("Year")
+                plt.ylabel("ln(Productivity index / Real product wage index)")
+                plt.legend(frameon=False)
+                plt.grid(True, alpha=0.3)
+                plt.figtext(0.5, -0.03, f"Gap computed from indices rebased to {g7_wage_base}.", ha="center",
+                            fontsize=9)
+                plt.tight_layout()
+                plt.savefig(COMPARATIVE_CHARTS_DIR / "firm_ts_gap_g7.png", dpi=300, bbox_inches="tight")
+                plt.close()
 
     # ===================== SAVE =====================
 
@@ -1311,123 +1326,194 @@ def run_worker_side_time_series() -> pd.DataFrame:
             continue
 
         stub = safe_file_stub(country)
-        time_range = get_year_range(tmp)
+
+        base_year_employee = base_years_employee.get(country)
+
+        tmp_indices = _trim_from_year(tmp, "year", base_year_employee)
+        time_range_indices = get_plot_year_range(tmp_indices)
+
+        scatter_tmp = tmp[["year", "g_prod_employee", "g_wage_real_ppp"]].dropna().copy()
+        scatter_time_range = get_plot_year_range(scatter_tmp)
+        fit_type_ts = choose_scatter_fit(scatter_tmp, "g_prod_employee", "g_wage_real_ppp")
+
+        if len(scatter_tmp) >= 3:
+            scatter_tmp["year_label"] = scatter_tmp["year"].astype(int).astype(str)
 
         save_line_plot(
-            df=tmp,
+            df=tmp_indices,
             x_col="year",
             y_cols=["prod_employee_index", "wage_real_ppp_index"],
-            labels=["Productivity per employee index", "Real wage PPP index"],
-            title=f"Worker-side indices: {country} ({time_range})",
-            y_label="Index (common start year within country)",
+            labels=["Real labour productivity per employee index", "Real wage PPP index"],
+            title=f"Worker-side indices: {country} ({time_range_indices})",
+            y_label="Index (common base year within country = 100)",
             file_name=f"worker_ts_indices_{stub}.png",
             output_dir=WORKER_TS_CHARTS_DIR,
+            start_year=base_year_employee,
+            note_text="Series: real GVA PPP per employee vs OECD real wage PPP.",
         )
 
         save_line_plot(
-            df=tmp,
+            df=tmp_indices,
             x_col="year",
             y_cols=["gap_worker_employee"],
-            labels=["Worker-side gap"],
-            title=f"Worker-side productivity-wage gap: {country} ({time_range})",
+            labels=["Worker-side productivity–real wage gap"],
+            title=f"Worker-side productivity–real wage gap: {country} ({time_range_indices})",
             y_label="ln(Productivity index / Real wage index)",
             file_name=f"worker_ts_gap_{stub}.png",
             output_dir=WORKER_TS_CHARTS_DIR,
             show_legend=False,
+            start_year=base_year_employee,
             hlines=[{"y": 0.0, "label": "Zero gap"}],
+            note_text="Gap = ln(real labour productivity per employee index / real wage PPP index).",
         )
 
-        scatter_tmp = tmp[["year", "g_prod_employee", "g_wage_real_ppp"]].dropna().copy()
         if len(scatter_tmp) >= 3:
-            scatter_tmp["year_label"] = scatter_tmp["year"].astype(int).astype(str)
             save_scatter_plot(
                 df=scatter_tmp,
                 x_col="g_prod_employee",
                 y_col="g_wage_real_ppp",
-                title=f"Worker-side pass-through scatter: {country} ({time_range})",
-                x_label="Δln(Productivity per employee, real PPP)",
+                title=f"Worker-side pass-through scatter: {country} ({scatter_time_range})",
+                x_label="Δln(Real labour productivity per employee, PPP)",
                 y_label="Δln(Real wage PPP)",
                 file_name=f"worker_ts_scatter_{stub}.png",
                 output_dir=WORKER_TS_CHARTS_DIR,
-                fit_type="linear",
+                fit_type=fit_type_ts,
                 label_col="year_label",
+                note_text="Scatter of annual log changes; wage series is OECD real wage PPP, productivity is employee-based.",
             )
 
-    # G7 comparative charts
-    g7_prod_employee, g7_prod_emp_base = rebase_single_series_common_year_across_countries(
-        df, "prod_real_ppp_per_employee", countries=BENCHMARK_COUNTRIES
-    )
-    g7_prod_employed, g7_prod_employed_base = rebase_single_series_common_year_across_countries(
-        df, "prod_real_ppp_per_employed", countries=BENCHMARK_COUNTRIES
-    )
-    g7_wage, g7_wage_base = rebase_single_series_common_year_across_countries(
-        df, "wage_pe_fte_real_ppp", countries=BENCHMARK_COUNTRIES
-    )
+            # =========================================================
+            # G7 COMPARATIVE CHARTS - WORKER SIDE TIME SERIES
+            # =========================================================
 
-    plt.figure(figsize=(10, 6))
-    for country in BENCHMARK_COUNTRIES:
-        tmp = df[df["country_name"] == country].dropna(subset=["year", "gap_worker_employee"])
-        if not tmp.empty:
-            plt.plot(tmp["year"], tmp["gap_worker_employee"], linewidth=1.8, label=country)
-    plt.axhline(0.0, linestyle="--", linewidth=1.2)
-    plt.title("Worker-side productivity-wage gap: G7 comparison (employee-based)")
-    plt.xlabel("Year")
-    plt.ylabel("ln(Productivity index / Real wage index)")
-    plt.legend(frameon=False)
-    plt.grid(True, alpha=0.3)
-    plt.tight_layout()
-    plt.savefig(COMPARATIVE_CHARTS_DIR / "worker_ts_gap_g7_employee.png", dpi=300, bbox_inches="tight")
-    plt.close()
+            g7_prod_employee, g7_prod_emp_base = rebase_single_series_common_year_across_countries(
+                df, "prod_real_ppp_per_employee", countries=BENCHMARK_COUNTRIES
+            )
+            g7_prod_employed, g7_prod_employed_base = rebase_single_series_common_year_across_countries(
+                df, "prod_real_ppp_per_employed", countries=BENCHMARK_COUNTRIES
+            )
+            g7_wage, g7_wage_base = rebase_single_series_common_year_across_countries(
+                df, "wage_pe_fte_real_ppp", countries=BENCHMARK_COUNTRIES
+            )
 
-    plt.figure(figsize=(10, 6))
-    for country in BENCHMARK_COUNTRIES:
-        tmp = df[df["country_name"] == country].dropna(subset=["year", "gap_worker_employed"])
-        if not tmp.empty:
-            plt.plot(tmp["year"], tmp["gap_worker_employed"], linewidth=1.8, label=country)
-    plt.axhline(0.0, linestyle="--", linewidth=1.2)
-    plt.title("Worker-side productivity-wage gap: G7 comparison (employed-based)")
-    plt.xlabel("Year")
-    plt.ylabel("ln(Productivity index / Real wage index)")
-    plt.legend(frameon=False)
-    plt.grid(True, alpha=0.3)
-    plt.tight_layout()
-    plt.savefig(COMPARATIVE_CHARTS_DIR / "worker_ts_gap_g7_employed.png", dpi=300, bbox_inches="tight")
-    plt.close()
+            g7_prod_employee = _trim_from_year(g7_prod_employee, "year", g7_prod_emp_base)
+            g7_prod_employed = _trim_from_year(g7_prod_employed, "year", g7_prod_employed_base)
+            g7_wage = _trim_from_year(g7_wage, "year", g7_wage_base)
 
-    plt.figure(figsize=(10, 6))
-    for country in BENCHMARK_COUNTRIES:
-        tmp = g7_prod_employee[g7_prod_employee["country_name"] == country].dropna(subset=["year", "prod_real_ppp_per_employee_common_index"])
-        if not tmp.empty:
-            plt.plot(tmp["year"], tmp["prod_real_ppp_per_employee_common_index"], linewidth=1.8, label=country)
-    plt.title(f"Worker-side productivity index: G7 comparison (employee-based, common base year = {g7_prod_emp_base})")
-    plt.xlabel("Year")
-    plt.ylabel("Index")
-    plt.legend(frameon=False)
-    plt.grid(True, alpha=0.3)
-    plt.tight_layout()
-    plt.savefig(COMPARATIVE_CHARTS_DIR / "worker_ts_prod_index_g7_employee.png", dpi=300, bbox_inches="tight")
-    plt.close()
+            time_range_g7_prod_employee = get_plot_year_range(g7_prod_employee)
+            time_range_g7_prod_employed = get_plot_year_range(g7_prod_employed)
+            time_range_g7_wage = get_plot_year_range(g7_wage)
 
-    plt.figure(figsize=(10, 6))
-    for country in BENCHMARK_COUNTRIES:
-        tmp = g7_wage[g7_wage["country_name"] == country].dropna(subset=["year", "wage_pe_fte_real_ppp_common_index"])
-        if not tmp.empty:
-            plt.plot(tmp["year"], tmp["wage_pe_fte_real_ppp_common_index"], linewidth=1.8, label=country)
-    plt.title(f"Worker-side real wage index: G7 comparison (common base year = {g7_wage_base})")
-    plt.xlabel("Year")
-    plt.ylabel("Index")
-    plt.legend(frameon=False)
-    plt.grid(True, alpha=0.3)
-    plt.tight_layout()
-    plt.savefig(COMPARATIVE_CHARTS_DIR / "worker_ts_wage_index_g7.png", dpi=300, bbox_inches="tight")
-    plt.close()
+            # --- 1) PRODUCTIVITY INDEX EMPLOYEE-BASED
+            plt.figure(figsize=(10, 6))
+            for country in BENCHMARK_COUNTRIES:
+                tmp = g7_prod_employee[g7_prod_employee["country_name"] == country].dropna(
+                    subset=["year", "prod_real_ppp_per_employee_common_index"]
+                )
+                if not tmp.empty:
+                    plt.plot(tmp["year"], tmp["prod_real_ppp_per_employee_common_index"], linewidth=1.8, label=country)
+
+            plt.title(
+                f"Worker-side productivity index: G7 comparison "
+                f"({time_range_g7_prod_employee}, employee-based, base = {g7_prod_emp_base})"
+            )
+            plt.xlabel("Year")
+            plt.ylabel("Index")
+            plt.legend(frameon=False)
+            plt.grid(True, alpha=0.3)
+            plt.figtext(0.5, -0.03, "Series: real GVA PPP per employee.", ha="center", fontsize=9)
+            plt.tight_layout()
+            plt.savefig(COMPARATIVE_CHARTS_DIR / "worker_ts_prod_index_g7_employee.png", dpi=300, bbox_inches="tight")
+            plt.close()
+
+            # --- 2) REAL WAGE PPP INDEX
+            plt.figure(figsize=(10, 6))
+            for country in BENCHMARK_COUNTRIES:
+                tmp = g7_wage[g7_wage["country_name"] == country].dropna(
+                    subset=["year", "wage_pe_fte_real_ppp_common_index"]
+                )
+                if not tmp.empty:
+                    plt.plot(tmp["year"], tmp["wage_pe_fte_real_ppp_common_index"], linewidth=1.8, label=country)
+
+            plt.title(
+                f"Worker-side real wage (PPP) index: G7 comparison "
+                f"({time_range_g7_wage}, base = {g7_wage_base})"
+            )
+            plt.xlabel("Year")
+            plt.ylabel("Index")
+            plt.legend(frameon=False)
+            plt.grid(True, alpha=0.3)
+            plt.figtext(0.5, -0.03, "Series: OECD average annual wages, constant prices and PPP.", ha="center",
+                        fontsize=9)
+            plt.tight_layout()
+            plt.savefig(COMPARATIVE_CHARTS_DIR / "worker_ts_wage_index_g7.png", dpi=300, bbox_inches="tight")
+            plt.close()
+
+            # --- 3) GAP EMPLOYEE-BASED
+            g7_gap_employee = _trim_from_year(
+                df[df["country_name"].isin(BENCHMARK_COUNTRIES)].copy(),
+                "year",
+                g7_prod_emp_base
+            )
+            time_range_g7_gap_employee = get_plot_year_range(g7_gap_employee)
+
+            plt.figure(figsize=(10, 6))
+            for country in BENCHMARK_COUNTRIES:
+                tmp = g7_gap_employee[g7_gap_employee["country_name"] == country].dropna(
+                    subset=["year", "gap_worker_employee"]
+                )
+                if not tmp.empty:
+                    plt.plot(tmp["year"], tmp["gap_worker_employee"], linewidth=1.8, label=country)
+
+            plt.axhline(0.0, linestyle="--", linewidth=1.2)
+            plt.title(
+                f"Worker-side productivity–real wage gap: G7 comparison "
+                f"({time_range_g7_gap_employee}, employee-based)"
+            )
+            plt.xlabel("Year")
+            plt.ylabel("ln(Productivity index / Real wage index)")
+            plt.legend(frameon=False)
+            plt.grid(True, alpha=0.3)
+            plt.figtext(0.5, -0.03, f"Gap computed from indices rebased to {g7_prod_emp_base}.", ha="center",
+                        fontsize=9)
+            plt.tight_layout()
+            plt.savefig(COMPARATIVE_CHARTS_DIR / "worker_ts_gap_g7_employee.png", dpi=300, bbox_inches="tight")
+            plt.close()
+
+            # --- 4) GAP EMPLOYED-BASED
+            g7_gap_employed = _trim_from_year(
+                df[df["country_name"].isin(BENCHMARK_COUNTRIES)].copy(),
+                "year",
+                g7_prod_employed_base
+            )
+            time_range_g7_gap_employed = get_plot_year_range(g7_gap_employed)
+
+            plt.figure(figsize=(10, 6))
+            for country in BENCHMARK_COUNTRIES:
+                tmp = g7_gap_employed[g7_gap_employed["country_name"] == country].dropna(
+                    subset=["year", "gap_worker_employed"]
+                )
+                if not tmp.empty:
+                    plt.plot(tmp["year"], tmp["gap_worker_employed"], linewidth=1.8, label=country)
+
+            plt.axhline(0.0, linestyle="--", linewidth=1.2)
+            plt.title(
+                f"Worker-side productivity–real wage gap: G7 comparison "
+                f"({time_range_g7_gap_employed}, employed-based)"
+            )
+            plt.xlabel("Year")
+            plt.ylabel("ln(Productivity index / Real wage index)")
+            plt.legend(frameon=False)
+            plt.grid(True, alpha=0.3)
+            plt.figtext(0.5, -0.03, f"Gap computed from indices rebased to {g7_prod_employed_base}.", ha="center",
+                        fontsize=9)
+            plt.tight_layout()
+            plt.savefig(COMPARATIVE_CHARTS_DIR / "worker_ts_gap_g7_employed.png", dpi=300, bbox_inches="tight")
+            plt.close()
 
     export_csv(df, "worker_side_time_series_processed.csv", CSV_PROCESSED_DIR)
+
     return df
-
-
-
-
 
 # =========================================================
 # MODULE 4 - WORKER-SIDE CROSS SECTION
