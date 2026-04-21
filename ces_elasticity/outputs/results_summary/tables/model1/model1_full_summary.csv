@@ -1,0 +1,2 @@
+model,sample,slope_variable,beta,sigma,r_squared,adj_r_squared,p_value,observations
+model1,full,x,-0.20507540312042633,1.2579809505523376,0.04178957943288519,-0.006120941595470608,0.3287350894356854,22

@@ -11,8 +11,28 @@ from pathlib import Path
 PROJECT_DIR = Path(__file__).resolve().parents[1]
 DATA_DIR = PROJECT_DIR / "data" / "processed" / "csv"
 OUTPUTS_DIR = PROJECT_DIR / "outputs"
-OUTPUTS_DIR.mkdir(parents=True, exist_ok=True)
-TXT_FILE = OUTPUTS_DIR / "results_summary.txt"
+
+TXT_FILE = OUTPUTS_DIR / "results_summary" / "txt" / "results_summary.txt"
+
+def create_output_structure():
+    paths = [
+        # charts
+        OUTPUTS_DIR / "charts" / "model1" / "full_sample",
+        OUTPUTS_DIR / "charts" / "model1" / "trimmed_sample",
+        OUTPUTS_DIR / "charts" / "model2" / "scatter",
+        OUTPUTS_DIR / "charts" / "model2" / "lines",
+        OUTPUTS_DIR / "charts" / "model3" / "scatter",
+        OUTPUTS_DIR / "charts" / "model3" / "lines",
+
+        # results
+        OUTPUTS_DIR / "results_summary" / "txt",
+        OUTPUTS_DIR / "results_summary" / "tables" / "model1",
+        OUTPUTS_DIR / "results_summary" / "tables" / "model2",
+        OUTPUTS_DIR / "results_summary" / "tables" / "model3",
+    ]
+
+    for path in paths:
+        path.mkdir(parents=True, exist_ok=True)
 
 LEVEL_FILE = "Table_CES_Total_Economy_Level.csv"
 GROWTH_FILE = "Table_CES_Total_Economy_Growth.csv"
@@ -38,8 +58,6 @@ SECTOR_LABELS = {
     "BTNXL": "Business Economy",
     "GTNXL": "Business Services"
 }
-
-YEARS_TO_SHOW = {"2001", "2008", "2009", "2015", "2020", "2021", "2022"}
 
 # =========================================================
 # HELPERS
@@ -321,7 +339,7 @@ def save_scatter_plot(
     plt.ylabel(y_label)
     plt.grid(True, alpha=0.3)
     plt.tight_layout()
-    plt.savefig(OUTPUTS_DIR / file_name, dpi=300, bbox_inches="tight")
+    plt.savefig(file_name, dpi=300, bbox_inches="tight")
     plt.close()
 
 def save_line_plot(
@@ -345,7 +363,7 @@ def save_line_plot(
     plt.ylabel(y_label)
     plt.grid(True, alpha=0.3)
     plt.tight_layout()
-    plt.savefig(OUTPUTS_DIR / file_name, dpi=300, bbox_inches="tight")
+    plt.savefig(file_name, dpi=300, bbox_inches="tight")
     plt.close()
 
 def get_influence_table(model, df_used: pd.DataFrame, label_col: str) -> pd.DataFrame:
@@ -380,6 +398,74 @@ def compare_models(model_full, model_trimmed, slope_name: str, model_name: str) 
     )
     print(text)
     write_to_txt(text)
+
+def export_regression_table(model, file_path: Path) -> None:
+    """
+    Export full regression output as structured table.
+    """
+    df = pd.DataFrame({
+        "variable": model.params.index,
+        "coefficient": model.params.values,
+        "std_error": model.bse.values,
+        "t_or_z_stat": model.tvalues.values,
+        "p_value": model.pvalues.values
+    })
+    df.to_csv(file_path, index=False)
+
+
+def export_model_summary(
+    model,
+    slope_name: str,
+    model_name: str,
+    sample_name: str,
+    file_path: Path
+) -> None:
+    """
+    Export compact model summary with beta, sigma, fit statistics and sample size.
+    """
+    beta = model.params.get(slope_name, np.nan)
+    sigma = compute_sigma(beta)
+
+    df = pd.DataFrame([{
+        "model": model_name,
+        "sample": sample_name,
+        "slope_variable": slope_name,
+        "beta": beta,
+        "sigma": sigma,
+        "r_squared": model.rsquared,
+        "adj_r_squared": model.rsquared_adj,
+        "p_value": model.pvalues.get(slope_name, np.nan),
+        "observations": int(model.nobs)
+    }])
+    df.to_csv(file_path, index=False)
+
+
+def export_dataset(df: pd.DataFrame, file_path: Path) -> None:
+    """
+    Export cleaned dataset / regression sample.
+    """
+    df.to_csv(file_path, index=False)
+
+
+def export_influence_table(df: pd.DataFrame, file_path: Path) -> None:
+    """
+    Export Model 1 influence diagnostics.
+    """
+    df.to_csv(file_path, index=False)
+
+
+def export_elasticities_summary(records: list[dict], file_path: Path) -> None:
+    pd.DataFrame(records).to_csv(file_path, index=False)
+
+def clean_sector_label(sector_code: str) -> str:
+    mapping = {
+        "_T": "total_economy",
+        "C": "manufacturing",
+        "BTE": "industry",
+        "BTNXL": "business_economy",
+        "GTNXL": "business_services"
+    }
+    return mapping.get(sector_code, sector_code.lower())
 
 # =========================================================
 # MODEL 1: CROSS-COUNTRY LEVELS (AMECO)
@@ -468,8 +554,25 @@ def run_ces_level_model() -> pd.DataFrame:
 
     summarize_sigma(model_full, "x", "MODEL 1A - CES Level Model (Full Sample)")
 
+    export_regression_table(
+        model_full,
+        OUTPUTS_DIR / "results_summary" / "tables" / "model1" / "model1_full_regression.csv"
+    )
+
+    export_model_summary(
+        model_full,
+        slope_name="x",
+        model_name="model1",
+        sample_name="full",
+        file_path=OUTPUTS_DIR / "results_summary" / "tables" / "model1" / "model1_full_summary.csv"
+    )
+
     influence_table = get_influence_table(model_full, df_used_full, "Reference_Area")
     influence_table_sorted = influence_table.sort_values("cooks_d", ascending=False)
+    export_influence_table(
+        influence_table_sorted,
+        OUTPUTS_DIR / "results_summary" / "tables" / "model1" / "model1_influence_diagnostics.csv"
+    )
 
     influence_text = (
         "MODEL 1 - INFLUENCE DIAGNOSTICS (SORTED BY COOK'S DISTANCE)\n"
@@ -502,6 +605,8 @@ def run_ces_level_model() -> pd.DataFrame:
 
     outlier_countries = influential_df["Reference_Area"].tolist()
 
+    model_trimmed = None
+
     if len(outlier_countries) > 0:
         df_trimmed = df[~df["Reference_Area"].isin(outlier_countries)].copy()
 
@@ -521,9 +626,35 @@ def run_ces_level_model() -> pd.DataFrame:
         )
 
         summarize_sigma(model_trimmed, "x", "MODEL 1B - CES Level Model (Without Influential Outliers)")
+
+        export_regression_table(
+            model_trimmed,
+            OUTPUTS_DIR / "results_summary" / "tables" / "model1" / "model1_trimmed_regression.csv"
+        )
+
+        export_model_summary(
+            model_trimmed,
+            slope_name="x",
+            model_name="model1",
+            sample_name="trimmed",
+            file_path=OUTPUTS_DIR / "results_summary" / "tables" / "model1" / "model1_trimmed_summary.csv"
+        )
+
         compare_models(model_full, model_trimmed, "x", "MODEL 1")
+
     else:
         df_trimmed = df.copy()
+
+    export_dataset(
+        df,
+        OUTPUTS_DIR / "results_summary" / "tables" / "model1" / "model1_dataset.csv"
+    )
+
+    if model_trimmed is not None:
+        export_dataset(
+            df_trimmed,
+            OUTPUTS_DIR / "results_summary" / "tables" / "model1" / "model1_trimmed_dataset.csv"
+        )
 
     # PLOTS
     df["country_label"] = df["Reference_Area_Code"].astype(str)
@@ -535,7 +666,7 @@ def run_ces_level_model() -> pd.DataFrame:
         title=f"Model 1A: Cross-country CES Relationship ({level_year})",
         x_label="ln(K/H)",
         y_label="ln(sL/sK)",
-        file_name="model1a_level_scatter_loglog_full.png",
+        file_name=OUTPUTS_DIR / "charts" / "model1" / "full_sample" / "model1a_loglog.png",
         fit_type="linear",
         alpha=0.85,
         label_col="country_label",
@@ -550,7 +681,7 @@ def run_ces_level_model() -> pd.DataFrame:
         title=f"Model 1A: Capital Intensity and Labour Share ({level_year})",
         x_label="Capital Stock / Hours Worked",
         y_label="Labour Share ALCD2 (%)",
-        file_name="model1a_level_scatter_levels_full.png",
+        file_name=OUTPUTS_DIR / "charts" / "model1" / "full_sample" / "model1a_levels.png",
         fit_type=None,
         alpha=0.85,
         label_col="country_label",
@@ -568,7 +699,7 @@ def run_ces_level_model() -> pd.DataFrame:
             title=f"Model 1B: CES Relationship Without Influential Outliers ({level_year})",
             x_label="ln(K/H)",
             y_label="ln(sL/sK)",
-            file_name="model1b_level_scatter_loglog_trimmed.png",
+            file_name=OUTPUTS_DIR / "charts" / "model1" / "trimmed_sample" / "model1b_loglog.png",
             fit_type="linear",
             alpha=0.85,
             label_col="country_label",
@@ -583,7 +714,7 @@ def run_ces_level_model() -> pd.DataFrame:
             title=f"Model 1B: Capital Intensity and Labour Share Without Influential Outliers ({level_year})",
             x_label="Capital Stock / Hours Worked",
             y_label="Labour Share ALCD2 (%)",
-            file_name="model1b_level_scatter_levels_trimmed.png",
+            file_name=OUTPUTS_DIR / "charts" / "model1" / "trimmed_sample" / "model1b_levels.png",
             fit_type=None,
             alpha=0.85,
             label_col="country_label",
@@ -689,6 +820,29 @@ def run_ces_total_growth_model() -> pd.DataFrame:
         cluster_col="Reference_Area"
     )
 
+    export_dataset(
+        df,
+        OUTPUTS_DIR / "results_summary" / "tables" / "model2" / "panel_dataset_model2.csv"
+    )
+
+    export_dataset(
+        used_df,
+        OUTPUTS_DIR / "results_summary" / "tables" / "model2" / "model2_regression_sample.csv"
+    )
+
+    export_regression_table(
+        model,
+        OUTPUTS_DIR / "results_summary" / "tables" / "model2" / "model2_regression.csv"
+    )
+
+    export_model_summary(
+        model,
+        slope_name="dx",
+        model_name="model2_total_growth",
+        sample_name="panel_fe",
+        file_path=OUTPUTS_DIR / "results_summary" / "tables" / "model2" / "model2_summary.csv"
+    )
+
     summarize_sigma(model, "dx", "MODEL 2 - CES Total Economy Growth")
     report_country_coverage(used_df, "Reference_Area", "MODEL 2 - REGRESSION SAMPLE COVERAGE")
 
@@ -700,7 +854,6 @@ def run_ces_total_growth_model() -> pd.DataFrame:
             time_range = get_time_range(tmp)
 
             tmp["Year_label"] = tmp["Year"].astype(int).astype(str)
-            tmp["label_year"] = tmp["Year_label"].where(tmp["Year_label"].isin(YEARS_TO_SHOW), np.nan)
 
             save_scatter_plot(
                 df=tmp,
@@ -709,10 +862,10 @@ def run_ces_total_growth_model() -> pd.DataFrame:
                 title=f"Model 2: {country} ({time_range})",
                 x_label="Δln(K/H)",
                 y_label="Δln(sL/sK)",
-                file_name=f"model2_scatter_dx_dy_{stub}.png",
+                file_name=OUTPUTS_DIR / "charts" / "model2" / "scatter" / f"model2_scatter_{stub}.png",
                 fit_type=None,
                 alpha=0.85,
-                label_col="label_year",
+                label_col="Year_label",
                 max_labels=None,
                 label_fontsize=8
             )
@@ -731,7 +884,7 @@ def run_ces_total_growth_model() -> pd.DataFrame:
                 title=f"Model 2 Labour Share: {country} ({time_range})",
                 x_label="Year",
                 y_label="Labour Share (LC/GVA)",
-                file_name=f"model2_labour_share_line_{stub}.png"
+                file_name=OUTPUTS_DIR / "charts" / "model2" / "lines" / f"model2_labour_share_{stub}.png"
             )
 
     return df
@@ -856,6 +1009,31 @@ def run_ces_sectoral_growth_model() -> pd.DataFrame:
         cluster_col="country_sector"
     )
 
+    model3_results = []
+
+    export_dataset(
+        df,
+        OUTPUTS_DIR / "results_summary" / "tables" / "model3" / "panel_dataset_model3.csv"
+    )
+
+    export_dataset(
+        used_df,
+        OUTPUTS_DIR / "results_summary" / "tables" / "model3" / "model3_regression_sample.csv"
+    )
+
+    export_regression_table(
+        model,
+        OUTPUTS_DIR / "results_summary" / "tables" / "model3" / "model3_regression.csv"
+    )
+
+    export_model_summary(
+        model,
+        slope_name="dx",
+        model_name="model3_sectoral_growth",
+        sample_name="panel_fe",
+        file_path=OUTPUTS_DIR / "results_summary" / "tables" / "model3" / "model3_summary.csv"
+    )
+
     summarize_sigma(model, "dx", "MODEL 3 - CES Sectoral Growth")
     report_group_coverage(
         used_df,
@@ -883,14 +1061,13 @@ def run_ces_sectoral_growth_model() -> pd.DataFrame:
 
             if len(tmp) >= MIN_OBS_SECTOR_CHARTS:
                 country_stub = safe_file_stub(country)
-                sector_stub = safe_file_stub(sector_code)
+                sector_stub = clean_sector_label(sector_code)
 
                 sector_name_raw = tmp["Economic_Activity"].iloc[0]
                 sector_label = SECTOR_LABELS.get(sector_code, sector_name_raw)
                 time_range = get_time_range(tmp)
 
                 tmp["Year_label"] = tmp["Year"].astype(int).astype(str)
-                tmp["label_year"] = tmp["Year_label"].where(tmp["Year_label"].isin(YEARS_TO_SHOW), np.nan)
 
                 save_scatter_plot(
                     df=tmp,
@@ -899,10 +1076,10 @@ def run_ces_sectoral_growth_model() -> pd.DataFrame:
                     title=f"Model 3: {country} - {sector_label} [{sector_code}] ({time_range})",
                     x_label="Δln(K/H)",
                     y_label="Δln(sL/sK)",
-                    file_name=f"model3_scatter_dx_dy_{country_stub}_{sector_stub}.png",
+                    file_name=OUTPUTS_DIR / "charts" / "model3" / "scatter" / f"model3_scatter_{country_stub}_{sector_stub}.png",
                     fit_type=None,
                     alpha=0.85,
-                    label_col="label_year",
+                    label_col="Year_label",
                     max_labels=None,
                     label_fontsize=8
                 )
@@ -917,7 +1094,7 @@ def run_ces_sectoral_growth_model() -> pd.DataFrame:
 
             if len(tmp) >= MIN_OBS_SECTOR_CHARTS:
                 country_stub = safe_file_stub(country)
-                sector_stub = safe_file_stub(sector_code)
+                sector_stub = clean_sector_label(sector_code)
 
                 sector_name_raw = tmp["Economic_Activity"].iloc[0]
                 sector_label = SECTOR_LABELS.get(sector_code, sector_name_raw)
@@ -930,7 +1107,7 @@ def run_ces_sectoral_growth_model() -> pd.DataFrame:
                     title=f"Model 3 Labour Share: {country} - {sector_label} [{sector_code}] ({time_range})",
                     x_label="Year",
                     y_label="Labour Share (LC/GVA)",
-                    file_name=f"model3_labour_share_line_{country_stub}_{sector_stub}.png"
+                    file_name=OUTPUTS_DIR / "charts" / "model3" / "lines" / f"model3_labour_share_{country_stub}_{sector_stub}.png"
                 )
 
     return df
@@ -942,10 +1119,10 @@ def run_ces_sectoral_growth_model() -> pd.DataFrame:
 def main() -> None:
     print("Running CES Elasticity of Substitution project...\n")
 
-    if TXT_FILE.exists():
-        TXT_FILE.unlink()
+    for file in OUTPUTS_DIR.rglob("*.txt"):
+        file.unlink()
 
-    for file in OUTPUTS_DIR.glob("*.png"):
+    for file in OUTPUTS_DIR.rglob("*.png"):
         file.unlink()
 
     intro = (
@@ -965,12 +1142,49 @@ def main() -> None:
         "- Model 3: scatter dx vs dy by country and selected macro-sector, with selected year labels and country-sector time range.\n"
         "- Model 3: labour-share line charts by country and selected macro-sector.\n"
     )
+
+    create_output_structure()
+
+    def clean_legacy_csv():
+        files_to_remove = [
+            OUTPUTS_DIR / "results_summary" / "tables" / "model1" / "full.csv",
+            OUTPUTS_DIR / "results_summary" / "tables" / "model1" / "trimmed.csv",
+            OUTPUTS_DIR / "results_summary" / "tables" / "model2" / "results.csv",
+            OUTPUTS_DIR / "results_summary" / "tables" / "model3" / "results.csv",
+        ]
+
+        for file in files_to_remove:
+            if file.exists():
+                file.unlink()
+
+    clean_legacy_csv()
+
     print(intro)
     write_to_txt(intro)
 
     run_ces_level_model()
     run_ces_total_growth_model()
     run_ces_sectoral_growth_model()
+
+    elasticity_records = []
+
+    summary_files = [
+        OUTPUTS_DIR / "results_summary" / "tables" / "model1" / "model1_full_summary.csv",
+        OUTPUTS_DIR / "results_summary" / "tables" / "model1" / "model1_trimmed_summary.csv",
+        OUTPUTS_DIR / "results_summary" / "tables" / "model2" / "model2_summary.csv",
+        OUTPUTS_DIR / "results_summary" / "tables" / "model3" / "model3_summary.csv",
+    ]
+
+    for file_path in summary_files:
+        if file_path.exists():
+            tmp = pd.read_csv(file_path)
+            elasticity_records.extend(tmp.to_dict(orient="records"))
+
+    if elasticity_records:
+        export_elasticities_summary(
+            elasticity_records,
+            OUTPUTS_DIR / "results_summary" / "tables" / "elasticities_summary.csv"
+        )
 
     final_message = (
         "\nAll CES analyses completed successfully.\n"

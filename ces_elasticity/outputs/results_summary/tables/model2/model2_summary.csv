@@ -1,0 +1,2 @@
+model,sample,slope_variable,beta,sigma,r_squared,adj_r_squared,p_value,observations
+model2_total_growth,panel_fe,dx,-0.40953692904910977,1.6935860161238967,0.3288273018299386,0.1772721764366989,0.15045914563923404,153
