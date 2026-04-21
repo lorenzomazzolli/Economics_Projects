@@ -17,3 +17,7 @@ __pycache__/
 
 # Outputs (optional - se non vuoi pushare immagini)
 # outputs/*.png
+
+.Rhistory
+.RData
+.Rproj.user/
