@@ -1,309 +1,314 @@
-# Productivity – Labour Compensation – Labour Share – ULC (G7 Analysis)
 
-## Overview
-
-This project analyses the relationship between labour productivity, wages, labour share, and unit labour costs (ULC) across G7 economies.
-
-The goal is to quantify the pass-through from productivity to wages, distinguishing between:
-
-- Firm-side perspective → real product wage, labour share, cost structure  
-- Worker-side perspective → real wages (PPP), purchasing power  
-
-The analysis combines:
-- panel time-series regressions (main results)
-- cross-section analysis (supporting evidence)
-- accounting-based decomposition checks
+# Productivity, Labour Compensation, Labour Share and Unit Labour Cost  
+## Firm-side vs Worker-side Pass-through Analysis (G7)
 
 ---
 
-## Project Structure
+## 1. Project Overview
 
-project_root/
+This project develops a coherent empirical framework to analyse the relationship between labour productivity, labour compensation, real wages, labour shares, and unit labour costs in G7 economies.
 
-data/  
-│   ├── raw/  
-│   └── processed/  
+The core objective is to quantify the pass-through from productivity to wages, distinguishing between two perspectives:
 
-outputs/  
-│   ├── charts/  
-│   │   ├── firm_side/  
-│   │   │   ├── time_series/  
-│   │   │   └── cross_section/  
-│   │   ├── worker_side/  
-│   │   │   ├── time_series/  
-│   │   │   └── cross_section/  
-│   │   └── comparative/  
-│   │  
-│   ├── csv/  
-│   └── txt/  
+- Firm-side: labour compensation deflated by output prices (real product wage)  
+- Worker-side: real wages in PPP terms (purchasing power)
 
-src/  
-│   ├── main.py  
-│   ├── helpers.py  
-│   └── config.py  
+The analysis is organised into four modules:
 
-README.md
+1. Firm-side time series  
+2. Firm-side cross section  
+3. Worker-side time series  
+4. Worker-side cross section  
+
+Key design choices:
+
+- Aggregate (total-economy) data only  
+- Labour share and ULC analysed within the firm-side framework  
+- Worker-side focuses on productivity vs real wages  
+- Two labour input definitions:
+  - per employee  
+  - per employed person  
+- Cross-section results are descriptive (G7 only)  
 
 ---
 
-## Requirements
+## 2. Theoretical Framework
 
-Install required Python packages:
+The baseline is a Cobb–Douglas production function under constant returns to scale:
 
-pip install pandas numpy matplotlib seaborn statsmodels pathlib
+Y = A K^α L^(1−α)
 
-Optional:
+Under standard assumptions:
 
-pip install jupyter notebook
+- Labour share = 1 − α  
+- Real product wage = labour productivity × labour share  
 
+Key identity:
 
----
+Δln(w/p) = Δln(productivity) + Δln(labour share)
 
-## Data
+Implications:
 
-The project uses pre-cleaned CSV datasets containing:
+- If productivity grows faster than wages → labour share declines  
+- If wages track productivity → labour share remains stable  
 
-Firm-side:
-- GVA (nominal and real)
-- Labour compensation
-- Unit labour costs (ULC)
-
-Worker-side:
-- Real wages (PPP, FTE)
-- Employment / employees
-- Productivity measures
-
-Place datasets in:
-
-data/raw/
+The CES framework (separate project) explains why labour shares vary over time, while this project measures actual pass-through dynamics.
 
 ---
 
-## Run the Project
+## 3. Data and Sample
 
-python src/product_labcomp_distr_analysis.py
+### Data Sources
 
-The pipeline will:
-1. Load and clean data  
-2. Compute transformations  
-3. Estimate regressions  
-4. Generate charts  
-5. Export outputs  
+- OECD Productivity Database  
+- OECD Average Annual Wages (constant prices, constant PPP)
+
+### Sample
+
+- Countries: G7 (United States, United Kingdom, Germany, France, Italy, Japan, Canada)  
+- Frequency: Annual  
+- Time coverage: variable-specific  
+- Structure:
+  - Time-series panel (core analysis)  
+  - Cross-section (2023 snapshot)
+
+### Firm-side Dataset
+
+Variables (national currency, production-consistent):
+
+- Gross Value Added (nominal and real)  
+- GVA per hour (real and nominal)  
+- Labour compensation (total and per hour)  
+- Unit labour cost (ULC) index  
+- Labour share  
+
+Used to construct:
+
+- productivity  
+- output-price inflation  
+- real product wage  
+- labour share  
+- ULC  
+
+### Worker-side Dataset
+
+Variables (PPP, purchasing power):
+
+- Real GVA (PPP-based)  
+- Employment and employees  
+- Real wages (PPP, constant prices)
+
+Two productivity definitions:
+
+- per employee  
+- per employed person  
+
+### Data Pipeline
+
+All data are:
+
+- cleaned and harmonised  
+- transformed into log growth rates  
+- used to construct indices  
+- assembled into panel datasets  
+
+Pipeline implemented in:
+
+productivity_labourcompensation_distribution/src/product_labcomp_distr_analysis.py
+
+Outputs include:
+
+- processed datasets  
+- regression outputs  
+- charts  
+- summary tables  
 
 ---
 
-## Data Processing Pipeline
+## 4. Methodology
 
-All variables are transformed using log-differences.
+### 4.1 Firm-side Time Series
 
-Productivity:
-g_prod_real = Δln(GVA per hour, real)
+Key transformations:
 
-Output price:
-g_Pout = g_prod_nom – g_prod_real
+g_prod_real = Δln(real GVA per hour)  
+g_prod_nom = Δln(nominal GVA per hour)  
+
+Output prices:
+
+g_P_output = g_prod_nom − g_prod_real  
 
 Real product wage:
-g_w_real_output = g_lc_nom – g_Pout
+
+g_w_real_output = g_LC_nom − g_P_output  
 
 Labour share:
-LS = Labour compensation / GVA
 
-ULC:
-ULC ≈ LC / Productivity
+LS = Labour Compensation / Nominal GVA  
 
----
+Gap:
 
-## Indices (Base 100)
-
-Indices are constructed using consistent rebasing rules:
-
-- Within-country comparisons → first common available year  
-- Cross-country comparisons → first common year across countries  
+Gap_firm = ln(Productivity index / Real product wage index)
 
 ---
 
-## Methodology
+### 4.2 Firm-side Regressions
 
-### Firm-side models
+Model 1A:
 
-Model 1A – Pass-through  
-g_w_real_output ~ g_prod_real + FE(country) + FE(year)
+Δln(w_real_output) = α_i + λ_t + β Δln(productivity)
 
-Measures how productivity translates into real product wages.
+Result:  
+β ≈ 0.44 → partial pass-through  
 
----
+Model 1B:
 
-Model 1B – Labour share identity  
-g_w_real_output ≈ g_prod_real + Δln(labour_share)
+Δln(w_real_output) = Δln(productivity) + Δln(labour share)
 
-This is an accounting identity (Cobb–Douglas benchmark).  
-Used only as a consistency check.
+This is an accounting identity, not a behavioural regression.
 
----
+Model 1C:
 
-Model 1C – ULC robustness  
-g_ulc_nom ~ g_prod_real
+Δln(ULC) = α_i + λ_t + β Δln(productivity)
 
-Measures cost pressure dynamics.
+Result:  
+β ≈ -0.56 → productivity reduces unit labour costs  
 
 ---
 
-### Worker-side models
+### 4.3 Worker-side Time Series
 
-g_wage_real_ppp ~ g_prod_employee  
-g_wage_real_ppp ~ g_prod_employed  
+Δln(w_real_PPP) = α_i + λ_t + γ Δln(productivity)
 
-Measures pass-through to purchasing power.
+Results:
 
----
-
-### Cross-section
-
-- Log-log regressions (G7, latest year)
-- Used as supporting evidence only
+- γ ≈ 0.36 (employee-based)  
+- γ ≈ 0.37 (employed-based)  
 
 ---
 
-## Results
-
-### Firm-side pass-through (Model 1A)
-
-Coefficient: 0.436  
-Highly significant  
-
-Interpretation:
-Productivity growth is only partially transmitted to real product wages.
-
----
-
-### Labour share identity (Model 1B)
-
-Coefficients:
-- Productivity: 1.000  
-- Labour share: 1.000  
-R² = 1.000  
-
-Interpretation:
-Pure accounting identity, not an empirical result.
-
----
-
-### ULC (Model 1C)
-
-ULC growth ≈ wage growth – productivity growth  
-
-Interpretation:
-Acts as a consistency and cost-pressure check.
-
----
-
-### Worker-side pass-through
-
-Employee-based: 0.356  
-Employed-based: 0.370  
-
-Interpretation:
-Lower than firm-side → incomplete transmission to purchasing power.
-
----
-
-### Cross-section (G7)
-
-Firm-side: 0.981  
-Worker-side: weaker  
-
-Interpretation:
-Consistent with theory but limited by small sample.
-
----
-
-## Gap Analysis
-
-gap = ln(Productivity index / Wage index)
-
-Compared to:
-- ln(labour_share)
-
-Result:
-Correlation ≈ 0.23  
-
-Interpretation:
-Theoretical link exists but not perfectly matched empirically.
-
----
-
-## Outputs
-
-CSV:
-- Processed datasets
-
-TXT:
-- Regression summaries
-- Correlation matrices
-- Consistency checks
-
-Charts:
+### 4.4 Cross Section (2023)
 
 Firm-side:
-- Productivity vs wage indices  
-- ULC index  
-- Labour share (dual axis)  
-- Gap  
-- Scatter plots  
+
+ln(labour compensation per hour) ~ ln(productivity per hour)
 
 Worker-side:
-- PPP wage vs productivity  
-- Gap (employee vs employed)  
 
-Comparative:
-- Productivity index  
-- Wage index  
-- ULC index  
-- Labour share index  
-- Gap  
+ln(real wage PPP) ~ ln(productivity)
 
 ---
 
-## Theoretical Interpretation
+## 5. Index Construction
 
-Cobb–Douglas benchmark:
+- Within-country: first common year  
+- Cross-country: first common year across countries  
 
-Real wage ≈ productivity  
-Labour share constant  
-
-Empirical findings:
-- Pass-through < 1  
-- Labour share varies  
-- Firm-side ≠ worker-side  
-
-CES interpretation:
-- Time-varying labour share  
-- Capital–labour substitution  
-- Explains incomplete pass-through  
+This ensures comparability and correct cumulative interpretation.
 
 ---
 
-## Limitations
+## 6. Results
 
-- Small cross-section (G7)  
-- PPP vs national accounts mismatch  
-- Labour share sensitive to self-employment  
-- Index construction depends on base year  
+### Firm-side
+
+- β ≈ 0.44 → partial pass-through  
+- Productivity grows faster than wages → labour share declines  
+
+### Worker-side
+
+- γ ≈ 0.36–0.37 → weaker pass-through  
+
+### Interpretation
+
+Firm-side pass-through is higher than worker-side.
+
+Main drivers:
+
+- labour share  
+- price wedge (output vs consumption prices)
 
 ---
 
-## Next Steps
+## 7. Comparative Summary (G7)
+
+- Italy and Japan show the largest productivity–wage gaps  
+- United Kingdom shows near full pass-through  
+- United States shows high productivity with moderate divergence  
+- Germany and France are intermediate cases  
+
+---
+
+## 8. Economic Interpretation
+
+Three mechanisms explain the results:
+
+1. Incomplete pass-through  
+2. Labour share adjustment  
+3. Output vs consumption price wedge  
+
+Firm-side reflects cost dynamics, while worker-side reflects purchasing power.
+
+---
+
+## 9. Final Takeaway
+
+Productivity growth does not automatically translate into real wages.
+
+- Firms retain part of productivity gains  
+- Workers capture even less  
+- The gap is persistent and structural  
+
+---
+
+## 10. Limitations
+
+- G7-only sample  
+- Small cross-section  
+- No sectoral decomposition  
+- Labour share approximation issues  
+- PPP vs output price mismatch  
+- Reduced-form regressions (not causal)
+
+---
+
+## 11. Project Structure
+
+project/
+
+data/ → Excel and CSV input datasets  
+docs/ → methodology document  
+outputs/charts/ → firm, worker, comparative charts  
+outputs/csv/ → processed, metadata, summary datasets  
+outputs/txt/ → regression outputs and logs  
+src/product_labcomp_distr_analysis → main pipeline  
+
+---
+
+## 12. Installation and Requirements
+
+pip install pandas numpy matplotlib statsmodels pathlib
+
+---
+
+## 13. How to Run
+
+python src/product_labcomp_distr_analysis
+
+Outputs generated:
+
+- charts  
+- CSV datasets  
+- summary tables  
+- textual results  
+
+---
+
+## 14. Extensions
 
 - Extend to OECD panel  
-- Sector-level analysis  
-- Integrate CES estimation  
+- Add sector-level analysis  
+- Integrate CES elasticity results  
+- Analyse price wedge dynamics  
 
 ---
-
-## Summary
-
-Productivity growth is not fully transmitted to wages.  
-The gap is persistent and systematic.  
-Worker-side effects are weaker than firm-side.  
-
-Distribution and labour share dynamics are central.
