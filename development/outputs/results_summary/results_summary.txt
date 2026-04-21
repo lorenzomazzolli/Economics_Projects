@@ -1,0 +1,593 @@
+DEVELOPMENT ECONOMICS PROJECT - RESULTS SUMMARY
+ =============================================
+
+STEP 1 — LOAD DATASETS
+----------------------
+Files found in data_dir:
+
+List of files in data/processed
+-------------------------------
+[1] "Country_Table.csv"                    "Metadata_Table.csv"                   "Model_1_Caveat_Table.csv"             "Model_1_Regression_Table_World.csv"  
+[5] "Model_1_Regression_Table.csv"         "Model_1_Z_Score_Regression_Table.csv" "Model_2_Caveat_Table.csv"             "Model_2_Regression_Table.csv"        
+[9] "Table_Cluster_World.csv"              
+
+Main sample rows (Model 1): 22
+Growth sample rows (Model 2): 22
+World sample rows: 203
+Z-score sample rows: 22
+
+STEP 2 — INSPECT MAIN SAMPLE
+----------------------------
+
+Model 1 - Original Column Names
+-------------------------------
+ [1] "Region"                                                           "Core.Growth.Model"                                               
+ [3] "Structural.Qualifier"                                             "Institution.Stability"                                           
+ [5] "Country.Name"                                                     "Country.Code"                                                    
+ [7] "Log.GDP.pc..Constant.2021.international....2023."                 "Governance.score...2.5.to.2.5..2023."                            
+ [9] "Human.capital.index.plus...HCI....overall.score..0.325..2025."    "Gross.capital.formation....of.GDP..2023."                        
+[11] "Trade....of.GDP...2023."                                          "Total.natural.resources.rents....of.GDP..2021."                  
+[13] "Foreign.direct.investment..net.inflows....of.GDP..avg.2010.2023." "Manufacturing..value.added....of.GDP..2023."                     
+[15] "Services..value.added....of.GDP..2023."                           
+
+
+Model 1 - Structure
+-------------------
+'data.frame':	22 obs. of  15 variables:
+ $ Region                                                          : chr  "Central Africa" "Central America" "Central America" "Central America" ...
+ $ Core.Growth.Model                                               : chr  "Oil-led" "Agrarian-led" "Services-led" "Services-led" ...
+ $ Structural.Qualifier                                            : chr  "Hydrocarbon-dominated economy" "Agrarian economy with low-diversification services" "Low-diversification services structure" "Low-diversification services structure" ...
+ $ Institution.Stability                                           : chr  "Fragile" "Fragile" "Fragile" "Fragile" ...
+ $ Country.Name                                                    : chr  "Nigeria" "Nicaragua" "El Salvador" "Guatemala" ...
+ $ Country.Code                                                    : chr  "NGA" "NIC" "SLV" "GTM" ...
+ $ Log.GDP.pc..Constant.2021.international....2023.                : num  8.97 8.92 9.34 9.42 8.77 ...
+ $ Governance.score...2.5.to.2.5..2023.                            : num  -1.005 -1.024 -0.277 -0.694 -0.744 ...
+ $ Human.capital.index.plus...HCI....overall.score..0.325..2025.   : num  131 178 157 142 140 ...
+ $ Gross.capital.formation....of.GDP..2023.                        : num  17.6 22.2 20.7 16.5 22.2 ...
+ $ Trade....of.GDP...2023.                                         : num  25.8 105 81.7 48.3 98.8 ...
+ $ Total.natural.resources.rents....of.GDP..2021.                  : num  8.553 3.841 0.535 1.929 1.225 ...
+ $ Foreign.direct.investment..net.inflows....of.GDP..avg.2010.2023.: num  0.795 7.217 1.567 2.048 4.635 ...
+ $ Manufacturing..value.added....of.GDP..2023.                     : num  9.27 14.43 12.49 14.01 15.21 ...
+ $ Services..value.added....of.GDP..2023.                          : num  51.7 46.5 60.8 61.4 57.6 ...
+NULL 
+
+
+Model 1 - Summary Statistics
+----------------------------
+    Region          Core.Growth.Model  Structural.Qualifier Institution.Stability Country.Name       Country.Code      
+ Length:22          Length:22          Length:22            Length:22             Length:22          Length:22         
+ Class :character   Class :character   Class :character     Class :character      Class :character   Class :character  
+ Mode  :character   Mode  :character   Mode  :character     Mode  :character      Mode  :character   Mode  :character  
+                                                                                                                       
+                                                                                                                       
+                                                                                                                       
+ Log.GDP.pc..Constant.2021.international....2023. Governance.score...2.5.to.2.5..2023. Human.capital.index.plus...HCI....overall.score..0.325..2025.
+ Min.   : 7.321                                   Min.   :-1.1790                      Min.   :118.2                                                
+ 1st Qu.: 8.934                                   1st Qu.:-0.7398                      1st Qu.:136.4                                                
+ Median : 9.284                                   Median :-0.3059                      Median :149.5                                                
+ Mean   : 9.338                                   Mean   :-0.3464                      Mean   :157.3                                                
+ 3rd Qu.: 9.852                                   3rd Qu.:-0.1018                      3rd Qu.:177.4                                                
+ Max.   :10.806                                   Max.   : 0.6502                      Max.   :214.4                                                
+ Gross.capital.formation....of.GDP..2023. Trade....of.GDP...2023. Total.natural.resources.rents....of.GDP..2021.
+ Min.   :10.02                            Min.   : 25.79          Min.   : 0.5353                               
+ 1st Qu.:16.74                            1st Qu.: 67.77          1st Qu.: 1.8451                               
+ Median :22.32                            Median : 85.03          Median : 3.9357                               
+ Mean   :22.98                            Mean   : 92.21          Mean   : 8.2818                               
+ 3rd Qu.:29.36                            3rd Qu.:124.31          3rd Qu.: 8.2469                               
+ Max.   :37.49                            Max.   :164.82          Max.   :35.2641                               
+ Foreign.direct.investment..net.inflows....of.GDP..avg.2010.2023. Manufacturing..value.added....of.GDP..2023. Services..value.added....of.GDP..2023.
+ Min.   :-2.602                                                   Min.   : 2.256                              Min.   :18.77                         
+ 1st Qu.: 1.616                                                   1st Qu.: 8.689                              1st Qu.:44.62                         
+ Median : 3.704                                                   Median :13.299                              Median :53.42                         
+ Mean   : 4.597                                                   Mean   :13.800                              Mean   :51.94                         
+ 3rd Qu.: 5.970                                                   3rd Qu.:15.992                              3rd Qu.:60.37                         
+ Max.   :22.915                                                   Max.   :26.333                              Max.   :67.99                          
+
+
+Model 1 - Missing Values by Column
+----------------------------------
+                                                          Region                                                Core.Growth.Model 
+                                                               0                                                                0 
+                                            Structural.Qualifier                                            Institution.Stability 
+                                                               0                                                                0 
+                                                    Country.Name                                                     Country.Code 
+                                                               0                                                                0 
+                Log.GDP.pc..Constant.2021.international....2023.                             Governance.score...2.5.to.2.5..2023. 
+                                                               0                                                                0 
+   Human.capital.index.plus...HCI....overall.score..0.325..2025.                         Gross.capital.formation....of.GDP..2023. 
+                                                               0                                                                0 
+                                         Trade....of.GDP...2023.                   Total.natural.resources.rents....of.GDP..2021. 
+                                                               0                                                                0 
+Foreign.direct.investment..net.inflows....of.GDP..avg.2010.2023.                      Manufacturing..value.added....of.GDP..2023. 
+                                                               0                                                                0 
+                          Services..value.added....of.GDP..2023. 
+                                                               0  
+
+Model 1 dimensions: 22 rows x 15 columns
+
+STEP 3 — RENAMED VARIABLES
+--------------------------
+
+Model 1 - Renamed Columns
+-------------------------
+ [1] "region"                "core_growth_model"     "structural_qualifier"  "institution_stability" "country_name"          "country_code"         
+ [7] "log_gdp_pc_2023"       "governance_2023"       "hci_plus_2025"         "gcf_2023"              "trade_2023"            "resource_rents_2021"  
+[13] "fdi_2023"              "manufacturing_va_2023" "services_va_2023"      
+
+
+Model 2 - Renamed Columns
+-------------------------
+ [1] "region"                "core_growth_model"     "structural_qualifier"  "institution_stability" "country_name"          "country_code"         
+ [7] "gdp_pc_growth"         "log_gdp_pc_2000"       "governance_avg"        "hci_plus_avg"          "gcf_avg"               "trade_avg"            
+[13] "resource_rents_avg"    "fdi_avg"               
+
+
+World Sample - Renamed Columns
+------------------------------
+ [1] "region"                "cluster"               "country_name"          "country_code"          "log_gdp_pc_2023"       "governance_2023"      
+ [7] "hci_plus_2025"         "gcf_2023"              "trade_2023"            "resource_rents_2021"   "manufacturing_va_2023" "services_va_2023"      
+
+
+Z-score Sample - Renamed Columns
+--------------------------------
+ [1] "region"                "core_growth_model"     "structural_qualifier"  "institution_stability" "country_name"          "country_code"         
+ [7] "log_gdp_pc_2023"       "governance_z"          "hci_plus_z"            "gcf_z"                 "trade_z"               "resource_rents_z"     
+[13] "fdi_z"                 "manufacturing_va_z"    "services_va_z"         
+
+STEP 4 — NUMERIC SUBSETS
+------------------------
+
+Model 1 - Summary Statistics (Numeric)
+--------------------------------------
+ log_gdp_pc_2023  governance_2023   hci_plus_2025      gcf_2023       trade_2023     resource_rents_2021    fdi_2023      manufacturing_va_2023
+ Min.   : 7.321   Min.   :-1.1790   Min.   :118.2   Min.   :10.02   Min.   : 25.79   Min.   : 0.5353     Min.   :-2.602   Min.   : 2.256       
+ 1st Qu.: 8.934   1st Qu.:-0.7398   1st Qu.:136.4   1st Qu.:16.74   1st Qu.: 67.77   1st Qu.: 1.8451     1st Qu.: 1.616   1st Qu.: 8.689       
+ Median : 9.284   Median :-0.3059   Median :149.5   Median :22.32   Median : 85.03   Median : 3.9357     Median : 3.704   Median :13.299       
+ Mean   : 9.338   Mean   :-0.3464   Mean   :157.3   Mean   :22.98   Mean   : 92.21   Mean   : 8.2818     Mean   : 4.597   Mean   :13.800       
+ 3rd Qu.: 9.852   3rd Qu.:-0.1018   3rd Qu.:177.4   3rd Qu.:29.36   3rd Qu.:124.31   3rd Qu.: 8.2469     3rd Qu.: 5.970   3rd Qu.:15.992       
+ Max.   :10.806   Max.   : 0.6502   Max.   :214.4   Max.   :37.49   Max.   :164.82   Max.   :35.2641     Max.   :22.915   Max.   :26.333       
+ services_va_2023
+ Min.   :18.77   
+ 1st Qu.:44.62   
+ Median :53.42   
+ Mean   :51.94   
+ 3rd Qu.:60.37   
+ Max.   :67.99    
+
+
+Model 2 - Summary Statistics (Numeric)
+--------------------------------------
+ gdp_pc_growth     log_gdp_pc_2000 governance_avg      hci_plus_avg      gcf_avg        trade_avg      resource_rents_avg    fdi_avg      
+ Min.   :-0.8624   Min.   :2.852   Min.   :-1.36284   Min.   :111.4   Min.   :10.07   Min.   : 54.38   Min.   : 0.3413    Min.   :-1.449  
+ 1st Qu.: 1.5012   1st Qu.:3.665   1st Qu.:-0.65746   1st Qu.:125.1   1st Qu.:20.59   1st Qu.: 74.16   1st Qu.: 1.8678    1st Qu.: 1.734  
+ Median : 2.1232   Median :3.855   Median :-0.38646   Median :148.9   Median :25.22   Median : 90.00   Median : 3.8307    Median : 3.931  
+ Mean   : 2.5982   Mean   :3.798   Mean   :-0.34707   Mean   :153.4   Mean   :25.29   Mean   : 94.01   Mean   : 7.0510    Mean   : 4.198  
+ 3rd Qu.: 3.1797   3rd Qu.:4.061   3rd Qu.: 0.04367   3rd Qu.:171.4   3rd Qu.:28.99   3rd Qu.:117.39   3rd Qu.:10.6713    3rd Qu.: 5.633  
+ Max.   : 7.7947   Max.   :4.268   Max.   : 0.66385   Max.   :217.1   Max.   :40.23   Max.   :161.76   Max.   :33.8832    Max.   :15.210   
+
+
+World Sample - Summary Statistics (Numeric)
+-------------------------------------------
+ log_gdp_pc_2023  governance_2023    hci_plus_2025       gcf_2023        trade_2023      resource_rents_2021 manufacturing_va_2023 services_va_2023
+ Min.   : 6.943   Min.   :-2.07054   Min.   : 72.43   Min.   :-3.735   Min.   :  2.474   Min.   : 0.0000     Min.   : 0.3311       Min.   :18.77   
+ 1st Qu.: 8.780   1st Qu.:-0.70475   1st Qu.:140.81   1st Qu.:19.298   1st Qu.: 53.033   1st Qu.: 0.1762     1st Qu.: 7.1817       1st Qu.:47.65   
+ Median : 9.733   Median :-0.08019   Median :190.81   Median :22.952   Median : 82.405   Median : 1.7338     Median :11.4563       Median :56.82   
+ Mean   : 9.635   Mean   :-0.02379   Mean   :187.68   Mean   :23.321   Mean   : 95.849   Mean   : 6.7179     Mean   :11.9452       Mean   :56.46   
+ 3rd Qu.:10.611   3rd Qu.: 0.64628   3rd Qu.:231.60   3rd Qu.:26.661   3rd Qu.:116.807   3rd Qu.: 8.5843     3rd Qu.:15.5192       3rd Qu.:63.94   
+ Max.   :11.776   Max.   : 1.77595   Max.   :283.79   Max.   :45.266   Max.   :402.567   Max.   :61.0347     Max.   :43.6867       Max.   :91.46   
+ NA's   :11                          NA's   :41       NA's   :37       NA's   :34        NA's   :11          NA's   :27            NA's   :16       
+
+STEP 5 — CLUSTERING VECTORS
+---------------------------
+
+Model 1 - Growth Model Distribution
+-----------------------------------
+
+     Agrarian-led       Diversified Manufacturing-led        Mining-led           Oil-led      Services-led 
+                3                 1                 3                 6                 3                 6  
+
+
+Model 1 - Region Distribution
+-----------------------------
+
+ Central Africa Central America         Guianas South-East Asia Southern Africa 
+              1               6               2               6               7  
+
+
+Model 1 - Institutional Stability Distribution
+----------------------------------------------
+
+     Fragile Intermediate       Stable 
+           9            5            8  
+
+STEP 6 — CORRELATION MATRICES
+-----------------------------
+
+Model 1 - Full Correlation Matrix
+---------------------------------
+                      log_gdp_pc_2023 governance_2023 hci_plus_2025 gcf_2023 trade_2023 resource_rents_2021 fdi_2023 manufacturing_va_2023 services_va_2023
+log_gdp_pc_2023                 1.000           0.641         0.632    0.074      0.284              -0.115   -0.365                 0.070            0.108
+governance_2023                 0.641           1.000         0.495    0.269      0.244              -0.161   -0.156                 0.021            0.402
+hci_plus_2025                   0.632           0.495         1.000    0.255      0.552              -0.381   -0.164                 0.546            0.179
+gcf_2023                        0.074           0.269         0.255    1.000      0.438              -0.212    0.138                 0.192            0.099
+trade_2023                      0.284           0.244         0.552    0.438      1.000               0.011    0.383                 0.477           -0.457
+resource_rents_2021            -0.115          -0.161        -0.381   -0.212      0.011               1.000    0.106                -0.463           -0.509
+fdi_2023                       -0.365          -0.156        -0.164    0.138      0.383               0.106    1.000                -0.186           -0.409
+manufacturing_va_2023           0.070           0.021         0.546    0.192      0.477              -0.463   -0.186                 1.000            0.051
+services_va_2023                0.108           0.402         0.179    0.099     -0.457              -0.509   -0.409                 0.051            1.000 
+
+
+Model 2 - Full Correlation Matrix
+---------------------------------
+                   gdp_pc_growth log_gdp_pc_2000 governance_avg hci_plus_avg gcf_avg trade_avg resource_rents_avg fdi_avg
+gdp_pc_growth              1.000          -0.262          0.011        0.281   0.263     0.252             -0.040   0.545
+log_gdp_pc_2000           -0.262           1.000          0.562        0.433  -0.249     0.159             -0.135  -0.609
+governance_avg             0.011           0.562          1.000        0.426   0.136     0.199             -0.374   0.037
+hci_plus_avg               0.281           0.433          0.426        1.000   0.211     0.669             -0.381  -0.091
+gcf_avg                    0.263          -0.249          0.136        0.211   1.000     0.480              0.240   0.324
+trade_avg                  0.252           0.159          0.199        0.669   0.480     1.000             -0.084   0.091
+resource_rents_avg        -0.040          -0.135         -0.374       -0.381   0.240    -0.084              1.000  -0.098
+fdi_avg                    0.545          -0.609          0.037       -0.091   0.324     0.091             -0.098   1.000 
+
+
+World Sample - Full Correlation Matrix
+--------------------------------------
+                      log_gdp_pc_2023 governance_2023 hci_plus_2025 gcf_2023 trade_2023 resource_rents_2021 manufacturing_va_2023 services_va_2023
+log_gdp_pc_2023                 1.000           0.775         0.901   -0.011      0.470              -0.186                 0.110            0.588
+governance_2023                 0.775           1.000         0.764    0.013      0.453              -0.353                -0.105            0.636
+hci_plus_2025                   0.901           0.764         1.000    0.030      0.406              -0.209                 0.098            0.564
+gcf_2023                       -0.011           0.013         0.030    1.000     -0.163               0.222                 0.124           -0.260
+trade_2023                      0.470           0.453         0.406   -0.163      1.000              -0.193                -0.073            0.505
+resource_rents_2021            -0.186          -0.353        -0.209    0.222     -0.193               1.000                -0.090           -0.504
+manufacturing_va_2023           0.110          -0.105         0.098    0.124     -0.073              -0.090                 1.000           -0.258
+services_va_2023                0.588           0.636         0.564   -0.260      0.505              -0.504                -0.258            1.000 
+
+Model 1 - Selected Pairwise Correlations
+---------------------------------------
+log_gdp_pc_2023 vs governance_2023 = 0.641
+log_gdp_pc_2023 vs hci_plus_2025 = 0.632
+log_gdp_pc_2023 vs gcf_2023 = 0.074
+log_gdp_pc_2023 vs trade_2023 = 0.284
+governance_2023 vs hci_plus_2025 = 0.495
+governance_2023 vs gcf_2023 = 0.269
+log_gdp_pc_2023 vs manufacturing_va_2023 = 0.07
+log_gdp_pc_2023 vs services_va_2023 = 0.108
+manufacturing_va_2023 vs trade_2023 = 0.477
+services_va_2023 vs trade_2023 = -0.457
+services_va_2023 vs hci_plus_2025 = 0.179
+log_gdp_pc_2023 vs resource_rents_2021 = -0.115
+governance_2023 vs resource_rents_2021 = -0.161
+manufacturing_va_2023 vs resource_rents_2021 = -0.463
+
+STEP 7 — SCATTER PLOT DIAGNOSTICS (MODEL 1)
+------------------------------------------
+Model 1 scatter plots saved in: /Users/lorenzomazzolli/Desktop/GITHUB/Economics_Projects/development/outputs/charts/model1_level
+
+STEP 8 — SCATTER PLOT DIAGNOSTICS (WORLD SAMPLE)
+-----------------------------------------------
+World sample scatter plots saved in: /Users/lorenzomazzolli/Desktop/GITHUB/Economics_Projects/development/outputs/charts/world_sample
+
+STEP 9 — SCATTER PLOT DIAGNOSTICS (MODEL 2)
+------------------------------------------
+Model 2 scatter plots saved in: /Users/lorenzomazzolli/Desktop/GITHUB/Economics_Projects/development/outputs/charts/model2_growth
+
+STEP 10 — REGRESSION ANALYSIS (MODEL 1)
+---------------------------------------
+
+Model 1.1 — Baseline Development Model
+--------------------------------------
+
+Call:
+lm(formula = log_gdp_pc_2023 ~ governance_2023 + hci_plus_2025 + 
+    gcf_2023 + trade_2023, data = df)
+
+Residuals:
+     Min       1Q   Median       3Q      Max 
+-1.22273 -0.24690 -0.05951  0.29106  1.24633 
+
+Coefficients:
+                  Estimate Std. Error t value Pr(>|t|)    
+(Intercept)      8.023e+00  9.543e-01   8.407 1.85e-07 ***
+governance_2023  7.118e-01  2.865e-01   2.485   0.0237 *  
+hci_plus_2025    1.251e-02  6.007e-03   2.083   0.0527 .  
+gcf_2023        -1.731e-02  1.925e-02  -0.900   0.3809    
+trade_2023      -8.973e-05  4.435e-03  -0.020   0.9841    
+---
+Signif. codes:  0 ‘***’ 0.001 ‘**’ 0.01 ‘*’ 0.05 ‘.’ 0.1 ‘ ’ 1
+
+Residual standard error: 0.5822 on 17 degrees of freedom
+Multiple R-squared:  0.5674,	Adjusted R-squared:  0.4656 
+F-statistic: 5.574 on 4 and 17 DF,  p-value: 0.004697
+ 
+
+
+Model 1.2a — Structure of the Economy (Manufacturing only)
+----------------------------------------------------------
+
+Call:
+lm(formula = log_gdp_pc_2023 ~ governance_2023 + hci_plus_2025 + 
+    gcf_2023 + trade_2023 + manufacturing_va_2023, data = df)
+
+Residuals:
+     Min       1Q   Median       3Q      Max 
+-1.33348 -0.33877 -0.01203  0.33823  0.85990 
+
+Coefficients:
+                       Estimate Std. Error t value Pr(>|t|)    
+(Intercept)            7.581627   1.001329   7.572 1.12e-06 ***
+governance_2023        0.581849   0.299931   1.940   0.0702 .  
+hci_plus_2025          0.016707   0.006779   2.465   0.0254 *  
+gcf_2023              -0.016363   0.018935  -0.864   0.4003    
+trade_2023             0.001161   0.004472   0.260   0.7984    
+manufacturing_va_2023 -0.029046   0.023046  -1.260   0.2256    
+---
+Signif. codes:  0 ‘***’ 0.001 ‘**’ 0.01 ‘*’ 0.05 ‘.’ 0.1 ‘ ’ 1
+
+Residual standard error: 0.5724 on 16 degrees of freedom
+Multiple R-squared:  0.6065,	Adjusted R-squared:  0.4835 
+F-statistic: 4.932 on 5 and 16 DF,  p-value: 0.006384
+ 
+
+
+Model 1.2b — Structure of the Economy (Services only)
+-----------------------------------------------------
+
+Call:
+lm(formula = log_gdp_pc_2023 ~ governance_2023 + hci_plus_2025 + 
+    gcf_2023 + trade_2023 + services_va_2023, data = df)
+
+Residuals:
+    Min      1Q  Median      3Q     Max 
+-1.0623 -0.2891  0.0689  0.2406  1.0606 
+
+Coefficients:
+                  Estimate Std. Error t value Pr(>|t|)    
+(Intercept)       9.226235   1.173386   7.863 6.93e-07 ***
+governance_2023   0.921920   0.302428   3.048  0.00766 ** 
+hci_plus_2025     0.017818   0.006597   2.701  0.01574 *  
+gcf_2023         -0.003906   0.020136  -0.194  0.84863    
+trade_2023       -0.008370   0.006618  -1.265  0.22412    
+services_va_2023 -0.029069   0.017857  -1.628  0.12308    
+---
+Signif. codes:  0 ‘***’ 0.001 ‘**’ 0.01 ‘*’ 0.05 ‘.’ 0.1 ‘ ’ 1
+
+Residual standard error: 0.5559 on 16 degrees of freedom
+Multiple R-squared:  0.6289,	Adjusted R-squared:  0.5129 
+F-statistic: 5.422 on 5 and 16 DF,  p-value: 0.004179
+ 
+
+
+Model 1.2c — Structure of the Economy (Manufacturing and Services)
+------------------------------------------------------------------
+
+Call:
+lm(formula = log_gdp_pc_2023 ~ governance_2023 + hci_plus_2025 + 
+    gcf_2023 + trade_2023 + manufacturing_va_2023 + services_va_2023, 
+    data = df)
+
+Residuals:
+     Min       1Q   Median       3Q      Max 
+-1.15830 -0.31385  0.06675  0.28638  0.86818 
+
+Coefficients:
+                       Estimate Std. Error t value Pr(>|t|)    
+(Intercept)            8.736977   1.385665   6.305 1.41e-05 ***
+governance_2023        0.805080   0.350538   2.297   0.0365 *  
+hci_plus_2025          0.019302   0.007039   2.742   0.0151 *  
+gcf_2023              -0.005879   0.020667  -0.284   0.7800    
+trade_2023            -0.006061   0.007506  -0.808   0.4320    
+manufacturing_va_2023 -0.017227   0.024826  -0.694   0.4983    
+services_va_2023      -0.023569   0.019808  -1.190   0.2526    
+---
+Signif. codes:  0 ‘***’ 0.001 ‘**’ 0.01 ‘*’ 0.05 ‘.’ 0.1 ‘ ’ 1
+
+Residual standard error: 0.5651 on 15 degrees of freedom
+Multiple R-squared:  0.6404,	Adjusted R-squared:  0.4966 
+F-statistic: 4.452 on 6 and 15 DF,  p-value: 0.008799
+ 
+
+
+Model 1.3 — Resource Curse with Interaction
+-------------------------------------------
+
+Call:
+lm(formula = log_gdp_pc_2023 ~ governance_2023 + hci_plus_2025 + 
+    gcf_2023 + trade_2023 + resource_rents_2021 + governance_2023:resource_rents_2021, 
+    data = df)
+
+Residuals:
+    Min      1Q  Median      3Q     Max 
+-1.1013 -0.2358 -0.0270  0.2675  0.9432 
+
+Coefficients:
+                                     Estimate Std. Error t value Pr(>|t|)    
+(Intercept)                          7.852315   1.118146   7.023 4.12e-06 ***
+governance_2023                      0.394043   0.351134   1.122   0.2794    
+hci_plus_2025                        0.014514   0.006694   2.168   0.0466 *  
+gcf_2023                            -0.016859   0.019860  -0.849   0.4093    
+trade_2023                          -0.003531   0.004945  -0.714   0.4862    
+resource_rents_2021                  0.038739   0.024461   1.584   0.1341    
+governance_2023:resource_rents_2021  0.072122   0.050397   1.431   0.1729    
+---
+Signif. codes:  0 ‘***’ 0.001 ‘**’ 0.01 ‘*’ 0.05 ‘.’ 0.1 ‘ ’ 1
+
+Residual standard error: 0.573 on 15 degrees of freedom
+Multiple R-squared:  0.6304,	Adjusted R-squared:  0.4825 
+F-statistic: 4.264 on 6 and 15 DF,  p-value: 0.01054
+ 
+
+
+Model 1.4 — Expanded Baseline with Resources and FDI
+----------------------------------------------------
+
+Call:
+lm(formula = log_gdp_pc_2023 ~ governance_2023 + hci_plus_2025 + 
+    gcf_2023 + trade_2023 + resource_rents_2021 + fdi_2023, data = df)
+
+Residuals:
+     Min       1Q   Median       3Q      Max 
+-0.89023 -0.19780 -0.09719  0.18081  1.16874 
+
+Coefficients:
+                     Estimate Std. Error t value Pr(>|t|)    
+(Intercept)          8.195685   1.174325   6.979 4.43e-06 ***
+governance_2023      0.666095   0.283390   2.350   0.0328 *  
+hci_plus_2025        0.009984   0.007436   1.343   0.1993    
+gcf_2023            -0.015084   0.019705  -0.765   0.4559    
+trade_2023           0.003269   0.005657   0.578   0.5720    
+resource_rents_2021  0.006643   0.013923   0.477   0.6402    
+fdi_2023            -0.045076   0.030963  -1.456   0.1660    
+---
+Signif. codes:  0 ‘***’ 0.001 ‘**’ 0.01 ‘*’ 0.05 ‘.’ 0.1 ‘ ’ 1
+
+Residual standard error: 0.5718 on 15 degrees of freedom
+Multiple R-squared:  0.6319,	Adjusted R-squared:  0.4847 
+F-statistic: 4.292 on 6 and 15 DF,  p-value: 0.01026
+ 
+
+STEP 11 — WORLD SAMPLE CORRELATION ROBUSTNESS
+---------------------------------------------
+
+World Sample - Summary Statistics
+---------------------------------
+    region            cluster          country_name       country_code       log_gdp_pc_2023  governance_2023    hci_plus_2025       gcf_2023     
+ Length:203         Length:203         Length:203         Length:203         Min.   : 6.943   Min.   :-2.07054   Min.   : 72.43   Min.   :-3.735  
+ Class :character   Class :character   Class :character   Class :character   1st Qu.: 8.780   1st Qu.:-0.70475   1st Qu.:140.81   1st Qu.:19.298  
+ Mode  :character   Mode  :character   Mode  :character   Mode  :character   Median : 9.733   Median :-0.08019   Median :190.81   Median :22.952  
+                                                                             Mean   : 9.635   Mean   :-0.02379   Mean   :187.68   Mean   :23.321  
+                                                                             3rd Qu.:10.611   3rd Qu.: 0.64628   3rd Qu.:231.60   3rd Qu.:26.661  
+                                                                             Max.   :11.776   Max.   : 1.77595   Max.   :283.79   Max.   :45.266  
+                                                                             NA's   :11                          NA's   :41       NA's   :37      
+   trade_2023      resource_rents_2021 manufacturing_va_2023 services_va_2023
+ Min.   :  2.474   Min.   : 0.0000     Min.   : 0.3311       Min.   :18.77   
+ 1st Qu.: 53.033   1st Qu.: 0.1762     1st Qu.: 7.1817       1st Qu.:47.65   
+ Median : 82.405   Median : 1.7338     Median :11.4563       Median :56.82   
+ Mean   : 95.849   Mean   : 6.7179     Mean   :11.9452       Mean   :56.46   
+ 3rd Qu.:116.807   3rd Qu.: 8.5843     3rd Qu.:15.5192       3rd Qu.:63.94   
+ Max.   :402.567   Max.   :61.0347     Max.   :43.6867       Max.   :91.46   
+ NA's   :34        NA's   :11          NA's   :27            NA's   :16       
+
+
+World Sample - Missing Values by Column
+---------------------------------------
+               region               cluster          country_name          country_code       log_gdp_pc_2023       governance_2023         hci_plus_2025 
+                    0                     0                     0                     0                    11                     0                    41 
+             gcf_2023            trade_2023   resource_rents_2021 manufacturing_va_2023      services_va_2023 
+                   37                    34                    11                    27                    16  
+
+STEP 12 — Z-SCORE ROBUSTNESS
+-----------------------------
+
+Model 1 Z-score Baseline
+------------------------
+
+Call:
+lm(formula = log_gdp_pc_2023 ~ governance_z + hci_plus_z + gcf_z + 
+    trade_z, data = df_z)
+
+Residuals:
+     Min       1Q   Median       3Q      Max 
+-1.22273 -0.24690 -0.05951  0.29106  1.24633 
+
+Coefficients:
+              Estimate Std. Error t value Pr(>|t|)    
+(Intercept)   9.309440   0.125986  73.893   <2e-16 ***
+governance_z  0.414177   0.166684   2.485   0.0237 *  
+hci_plus_z    0.355265   0.170558   2.083   0.0527 .  
+gcf_z        -0.141903   0.157727  -0.900   0.3809    
+trade_z      -0.003473   0.171682  -0.020   0.9841    
+---
+Signif. codes:  0 ‘***’ 0.001 ‘**’ 0.01 ‘*’ 0.05 ‘.’ 0.1 ‘ ’ 1
+
+Residual standard error: 0.5822 on 17 degrees of freedom
+Multiple R-squared:  0.5674,	Adjusted R-squared:  0.4656 
+F-statistic: 5.574 on 4 and 17 DF,  p-value: 0.004697
+ 
+
+STEP 13 — GROWTH BASELINE (MODEL 2)
+-----------------------------------
+
+Model 2 - Column Names
+----------------------
+ [1] "region"                "core_growth_model"     "structural_qualifier"  "institution_stability" "country_name"          "country_code"         
+ [7] "gdp_pc_growth"         "log_gdp_pc_2000"       "governance_avg"        "hci_plus_avg"          "gcf_avg"               "trade_avg"            
+[13] "resource_rents_avg"    "fdi_avg"               
+
+
+Model 2 - Structure
+-------------------
+'data.frame':	22 obs. of  14 variables:
+ $ region               : chr  "Central Africa" "Central America" "Central America" "Central America" ...
+ $ core_growth_model    : chr  "Oil-led" "Agrarian-led" "Services-led" "Services-led" ...
+ $ structural_qualifier : chr  "Hydrocarbon-dominated economy" "Agrarian economy with low-diversification services" "Low-diversification services structure" "Low-diversification services structure" ...
+ $ institution_stability: chr  "Fragile" "Fragile" "Fragile" "Fragile" ...
+ $ country_name         : chr  "Nigeria" "Nicaragua" "El Salvador" "Guatemala" ...
+ $ country_code         : chr  "NGA" "NIC" "SLV" "GTM" ...
+ $ gdp_pc_growth        : num  2.08 1.92 1.77 1.5 1.72 ...
+ $ log_gdp_pc_2000      : num  3.69 3.69 3.88 3.94 3.66 ...
+ $ governance_avg       : num  -1.12 -0.663 -0.249 -0.641 -0.64 ...
+ $ hci_plus_avg         : num  120 168 156 141 149 ...
+ $ gcf_avg              : num  20.6 26.4 18.3 16.8 25.5 ...
+ $ trade_avg            : num  93.6 90.8 74.5 57.6 114.4 ...
+ $ resource_rents_avg   : num  12.947 2.404 0.766 1.84 1.511 ...
+ $ fdi_avg              : num  1.33 6.12 2.26 1.08 5.06 ...
+NULL 
+
+
+Model 2 - Summary
+-----------------
+    region          core_growth_model  structural_qualifier institution_stability country_name       country_code       gdp_pc_growth     log_gdp_pc_2000
+ Length:22          Length:22          Length:22            Length:22             Length:22          Length:22          Min.   :-0.8624   Min.   :2.852  
+ Class :character   Class :character   Class :character     Class :character      Class :character   Class :character   1st Qu.: 1.5012   1st Qu.:3.665  
+ Mode  :character   Mode  :character   Mode  :character     Mode  :character      Mode  :character   Mode  :character   Median : 2.1232   Median :3.855  
+                                                                                                                        Mean   : 2.5982   Mean   :3.798  
+                                                                                                                        3rd Qu.: 3.1797   3rd Qu.:4.061  
+                                                                                                                        Max.   : 7.7947   Max.   :4.268  
+ governance_avg      hci_plus_avg      gcf_avg        trade_avg      resource_rents_avg    fdi_avg      
+ Min.   :-1.36284   Min.   :111.4   Min.   :10.07   Min.   : 54.38   Min.   : 0.3413    Min.   :-1.449  
+ 1st Qu.:-0.65746   1st Qu.:125.1   1st Qu.:20.59   1st Qu.: 74.16   1st Qu.: 1.8678    1st Qu.: 1.734  
+ Median :-0.38646   Median :148.9   Median :25.22   Median : 90.00   Median : 3.8307    Median : 3.931  
+ Mean   :-0.34707   Mean   :153.4   Mean   :25.29   Mean   : 94.01   Mean   : 7.0510    Mean   : 4.198  
+ 3rd Qu.: 0.04367   3rd Qu.:171.4   3rd Qu.:28.99   3rd Qu.:117.39   3rd Qu.:10.6713    3rd Qu.: 5.633  
+ Max.   : 0.66385   Max.   :217.1   Max.   :40.23   Max.   :161.76   Max.   :33.8832    Max.   :15.210   
+
+
+Model 2 - Missing Values by Column
+----------------------------------
+               region     core_growth_model  structural_qualifier institution_stability          country_name          country_code         gdp_pc_growth 
+                    0                     0                     0                     0                     0                     0                     0 
+      log_gdp_pc_2000        governance_avg          hci_plus_avg               gcf_avg             trade_avg    resource_rents_avg               fdi_avg 
+                    0                     0                     0                     0                     0                     0                     0  
+
+
+Model 2 — Growth Baseline
+-------------------------
+
+Call:
+lm(formula = gdp_pc_growth ~ log_gdp_pc_2000 + governance_avg + 
+    hci_plus_avg + gcf_avg + trade_avg, data = df_growth)
+
+Residuals:
+    Min      1Q  Median      3Q     Max 
+-2.1691 -0.8815 -0.2386  0.1601  5.7153 
+
+Coefficients:
+                  Estimate Std. Error t value Pr(>|t|)
+(Intercept)      8.8839027  7.0950637   1.252    0.229
+log_gdp_pc_2000 -2.8197871  1.6873574  -1.671    0.114
+governance_avg   0.3437528  0.9865146   0.348    0.732
+hci_plus_avg     0.0285803  0.0206713   1.383    0.186
+gcf_avg          0.0080463  0.0731661   0.110    0.914
+trade_avg       -0.0004794  0.0221974  -0.022    0.983
+
+Residual standard error: 1.878 on 16 degrees of freedom
+Multiple R-squared:  0.2683,	Adjusted R-squared:  0.03965 
+F-statistic: 1.173 on 5 and 16 DF,  p-value: 0.3647
+ 
+
+Coding completed successfully.
+
+Model 1 charts folder: /Users/lorenzomazzolli/Desktop/GITHUB/Economics_Projects/development/outputs/charts/model1_level
+Model 2 charts folder: /Users/lorenzomazzolli/Desktop/GITHUB/Economics_Projects/development/outputs/charts/model2_growth
+World sample charts folder: /Users/lorenzomazzolli/Desktop/GITHUB/Economics_Projects/development/outputs/charts/world_sample
+Results summary file: /Users/lorenzomazzolli/Desktop/GITHUB/Economics_Projects/development/outputs/results_summary/results_summary.txt
