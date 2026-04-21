@@ -30,7 +30,7 @@ Required packages:
 
 Install packages with pip:
 
-pip install pandas numpy statsmodels matplotlib
+pip install pandas numpy statsmodels matplotlib pathlib
 
 
 PROJECT STRUCTURE
